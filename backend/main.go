@@ -14,6 +14,7 @@ func main() {
 	}
 
 	siswaRepo := repo.NewSiswaRepository(db)
-	mainApi := api.NewAPI(*siswaRepo)
+	adminRepo := repo.NewAdminRepository(db)
+	mainApi := api.NewAPI(*siswaRepo, *adminRepo)
 	mainApi.Start()
 }

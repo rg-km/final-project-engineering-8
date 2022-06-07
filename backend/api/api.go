@@ -9,17 +9,31 @@ import (
 
 type API struct {
 	siswaRepo repo.SiswaRepository
+	adminRepo repo.AdminRepository
 	gin       *gin.Engine
 }
 
-func NewAPI(siswaRepo repo.SiswaRepository) *API {
+func NewAPI(siswaRepo repo.SiswaRepository, adminRepo repo.AdminRepository) *API {
 	gin := gin.Default()
 	api := &API{
 		siswaRepo: siswaRepo,
+		adminRepo: adminRepo,
 		gin:       gin,
 	}
 
-	gin.POST("/login/siswa", api.LoginSiswa)
+	// gin.POST("/login/siswa", api.LoginSiswa)
+
+	//routes for siswa
+	siswa := gin.Group("/siswa")
+	{
+		siswa.POST("/login", api.LoginSiswa)
+	}
+
+	//routes for admin
+	admin := gin.Group("/admin")
+	{
+		admin.POST("/login", api.LoginAdmin)
+	}
 
 	return api
 }
