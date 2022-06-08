@@ -36,6 +36,26 @@ func (api *API) LoginSiswa(c *gin.Context) {
 		return
 	}
 
+	if cred.Username == "" && cred.Password == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "username dan password tidak boleh kosong",
+		})
+		return
+	} else if cred.Username == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "username tidak boleh kosong",
+		})
+		return
+	} else if cred.Password == "" {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "password tidak boleh kosong",
+		})
+		return
+	}
+
 	resp, err := api.siswaRepo.LoginSiswa(cred.Username, cred.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
@@ -47,6 +67,12 @@ func (api *API) LoginSiswa(c *gin.Context) {
 	dataUser := *resp
 
 	if dataUser.Password != cred.Password {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "user credential invalid",
+		})
+		return
+	} else if dataUser.Username != cred.Username {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
 			"message": "user credential invalid",
@@ -84,5 +110,6 @@ func (api *API) LoginSiswa(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "login success",
+		"data":    dataUser,
 	})
 }
