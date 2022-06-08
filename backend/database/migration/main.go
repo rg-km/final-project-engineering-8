@@ -61,7 +61,7 @@ func CreateTableTest(db *sql.DB) (string, error) {
 		kategori varchar(255) not null
 	);
 
-	CREATE TABLE IF NOT EXISTS Guru (
+	CREATE TABLE IF NOT EXISTS guru (
 		GuruID integer not null primary key AUTOINCREMENT,
 		username varchar(255) not null,
 		password varchar(255) not null,
