@@ -9,21 +9,6 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-//inputan user
-type Credentials struct {
-	Username string `json:"username"`
-	Password string `json:"password"`
-}
-
-//jwt token
-var jwtKey = []byte("key")
-
-type Claims struct {
-	Username string
-	Role     string
-	jwt.StandardClaims
-}
-
 func (api *API) LoginSiswa(c *gin.Context) {
 	var cred Credentials
 	err := json.NewDecoder(c.Request.Body).Decode(&cred)
@@ -80,7 +65,7 @@ func (api *API) LoginSiswa(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Local().Add((5 * time.Minute) + (7 * time.Hour) + (5 * time.Minute))
 
 	claims := &Claims{
 		Username: cred.Username,
@@ -111,5 +96,28 @@ func (api *API) LoginSiswa(c *gin.Context) {
 		"code":    http.StatusOK,
 		"message": "login success",
 		"data":    dataUser,
+	})
+}
+
+func (api *API) GetSiswa(c *gin.Context) {
+
+	err := MiddlawareSiswa(c)
+	if err != nil {
+		return
+	}
+
+	dataSiswa, err := api.siswaRepo.FetchAllUsers()
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "success",
+		"data":    dataSiswa,
 	})
 }

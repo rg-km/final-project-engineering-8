@@ -28,3 +28,24 @@ func (u *SiswaRepository) LoginSiswa(username string, password string) (*Siswa, 
 
 	return &user, nil
 }
+
+func (u *SiswaRepository) FetchAllUsers() ([]Siswa, error) {
+	sqlStmt := `SELECT * FROM siswa`
+	rows, err := u.db.Query(sqlStmt)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	siswae := []Siswa{}
+	for rows.Next() {
+		var siswa Siswa
+		err := rows.Scan(&siswa.SiswaID, &siswa.Username, &siswa.Password, &siswa.Nama, &siswa.Alamat, &siswa.RoleID)
+		if err != nil {
+			return nil, err
+		}
+		siswae = append(siswae, siswa)
+	}
+	return siswae, nil
+	// return []User{}, nil // TODO: replace this
+}

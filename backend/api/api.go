@@ -29,6 +29,7 @@ func NewAPI(siswaRepo repo.SiswaRepository, adminRepo repo.AdminRepository, guru
 	siswa := gin.Group("/siswa")
 	{
 		siswa.POST("/login", api.LoginSiswa)
+		siswa.GET("/get", api.GetSiswa)
 	}
 
 	//routes for admin
