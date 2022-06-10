@@ -98,3 +98,27 @@ func (api *API) LoginUser(c *gin.Context) {
 		"data":    dataUser,
 	})
 }
+
+func (api *API) Register(c *gin.Context) {
+	var register Register
+	if err := c.ShouldBindJSON(&register); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	// register.Username = c.PostForm("username")
+	data, err := api.userRepo.Register(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Role)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"code":    "500",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"code": "200",
+		"data": data,
+	})
+}

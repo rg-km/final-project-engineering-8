@@ -8,6 +8,15 @@ type Credentials struct {
 	Password string `json:"password"`
 }
 
+type Register struct {
+	Username string `json:"username"`
+	Password string `json:"password"`
+	Nama     string `json:"nama"`
+	Alamat   string `json:"alamat"`
+	NoHp     string `json:"no_hp"`
+	Role     string `json:"role"`
+}
+
 //jwt token
 var jwtKey = []byte("key")
 
