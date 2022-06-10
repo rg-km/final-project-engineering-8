@@ -9,22 +9,7 @@ import (
 	"github.com/golang-jwt/jwt/v4"
 )
 
-//inputan user
-// type Credentials struct {
-// 	Username string `json:"username"`
-// 	Password string `json:"password"`
-// }
-
-// //jwt token
-// var jwtKey = []byte("key")
-
-// type Claims struct {
-// 	Username string
-// 	Role     string
-// 	jwt.StandardClaims
-// }
-
-func (api *API) LoginAdmin(c *gin.Context) {
+func (api *API) LoginUser(c *gin.Context) {
 	var cred Credentials
 	err := json.NewDecoder(c.Request.Body).Decode(&cred)
 
@@ -56,7 +41,7 @@ func (api *API) LoginAdmin(c *gin.Context) {
 		return
 	}
 
-	resp, err := api.adminRepo.LoginAdmin(cred.Username, cred.Password)
+	resp, err := api.userRepo.LoginUser(cred.Username, cred.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"code":    http.StatusInternalServerError,
@@ -80,11 +65,11 @@ func (api *API) LoginAdmin(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Add(5 * time.Minute)
+	expirationTime := time.Now().Local().Add((5 * time.Minute) + (7 * time.Hour) + (5 * time.Minute))
 
 	claims := &Claims{
 		Username: cred.Username,
-		Role:     "admin",
+		Role:     "user",
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},

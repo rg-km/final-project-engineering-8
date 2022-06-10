@@ -13,9 +13,7 @@ func main() {
 		panic(err)
 	}
 
-	siswaRepo := repo.NewSiswaRepository(db)
-	adminRepo := repo.NewAdminRepository(db)
-	guruRepo := repo.NewGuruRepository(db)
-	mainApi := api.NewAPI(*siswaRepo, *adminRepo, *guruRepo)
+	userRepo := repo.NewUserRepository(db)
+	mainApi := api.NewAPI(*userRepo)
 	mainApi.Start()
 }
