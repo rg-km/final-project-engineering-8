@@ -21,12 +21,15 @@ func NewAPI(userRepo repo.UserRepository) *API {
 
 	// gin.POST("/login/siswa", api.LoginSiswa)
 
-	user := gin.Group("/user")
-	{
-		user.POST("/login", api.LoginUser)
-	}
+	// user := gin.Group("/user")
+	// {
+	// 	user.POST("/login", api.LoginUser)
+	// 	user.POST("/logout", api.Logout)
+	// }
 
+	gin.POST("/login", api.LoginUser)
 	gin.POST("/register", api.Register)
+	gin.POST("/logout", api.Logout)
 
 	return api
 }

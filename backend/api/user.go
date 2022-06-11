@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -65,7 +66,7 @@ func (api *API) LoginUser(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Local().Add((5 * time.Minute) + (7 * time.Hour) + (5 * time.Minute))
+	expirationTime := time.Now().Local().Add((5 * time.Minute))
 
 	claims := &Claims{
 		Username: cred.Username,
@@ -120,5 +121,29 @@ func (api *API) Register(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code": "200",
 		"data": data,
+	})
+}
+
+func (api *API) Logout(c *gin.Context) {
+	//logout
+	_, err := c.Request.Cookie("token")
+	fmt.Println(err)
+	if err != nil {
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"code":    http.StatusUnauthorized,
+			"message": "anda belum login",
+		})
+		return
+	}
+
+	http.SetCookie(c.Writer, &http.Cookie{
+		Name:    "token",
+		Value:   "",
+		Expires: time.Unix(0, 0),
+	})
+
+	c.JSON(http.StatusOK, gin.H{
+		"code":    http.StatusOK,
+		"message": "logout success",
 	})
 }
