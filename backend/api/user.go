@@ -2,7 +2,6 @@ package api
 
 import (
 	"encoding/json"
-	"fmt"
 	"net/http"
 	"time"
 
@@ -11,6 +10,7 @@ import (
 )
 
 func (api *API) LoginUser(c *gin.Context) {
+	api.AllowOrigin(c)
 	var cred Credentials
 	err := json.NewDecoder(c.Request.Body).Decode(&cred)
 
@@ -101,6 +101,7 @@ func (api *API) LoginUser(c *gin.Context) {
 }
 
 func (api *API) Register(c *gin.Context) {
+	api.AllowOrigin(c)
 	var register Register
 	if err := c.ShouldBindJSON(&register); err != nil {
 		c.JSON(400, gin.H{
@@ -126,15 +127,16 @@ func (api *API) Register(c *gin.Context) {
 
 func (api *API) Logout(c *gin.Context) {
 	//logout
-	_, err := c.Request.Cookie("token")
-	fmt.Println(err)
-	if err != nil {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "anda belum login",
-		})
-		return
-	}
+	// _, err := c.Request.Cookie("token")
+	// fmt.Println(err)
+	// if err != nil {
+	// 	c.JSON(http.StatusUnauthorized, gin.H{
+	// 		"code":    http.StatusUnauthorized,
+	// 		"message": "anda belum login",
+	// 	})
+	// 	return
+	// }
+	api.AllowOrigin(c)
 
 	http.SetCookie(c.Writer, &http.Cookie{
 		Name:    "token",
