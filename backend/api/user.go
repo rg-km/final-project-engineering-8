@@ -2,6 +2,7 @@ package api
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 	"time"
 
@@ -147,5 +148,66 @@ func (api *API) Logout(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"code":    http.StatusOK,
 		"message": "logout success",
+	})
+}
+
+func (api *API) GetTeachers(c *gin.Context) {
+	api.AllowOrigin(c)
+
+	var (
+		page    int
+		perPage int
+		offset  int
+		total   int
+	)
+
+	params := c.Request.URL.Query()
+
+	//Convert string to int
+	_, err := fmt.Sscan(params.Get("per_page"), &perPage)
+	_, err = fmt.Sscan(params.Get("page"), &page)
+
+	if err != nil && err.Error() != "EOF" { // chcek jika tidak error dan jika errornya karena mengirim param yg tidak bisa di convert ke int
+		c.JSON(http.StatusBadRequest, Result{
+			Status:  false,
+			Code:    http.StatusBadRequest,
+			Message: "Throw a param with the value convertible to a number, ERROR: " + err.Error(),
+			Data:    []string{},
+		})
+		return
+	}
+
+	// set default value for (optional) params
+	if perPage == 0 || page == 0 {
+		perPage = 50
+		page = 1
+	}
+
+	offset = (page - 1) * perPage
+
+	teachers, err := api.userRepo.FetchAllTeachers(perPage, offset)
+	total, err = api.userRepo.GetNumberofTeacherRow()
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: "Failed to fetch teachers, " + err.Error(),
+			Data:    teachers,
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    teachers,
+		Pagination: &Pagination{
+			Total:     total,
+			Page:      page,
+			PerPage:   perPage,
+			TotalPage: 10,
+		},
 	})
 }
