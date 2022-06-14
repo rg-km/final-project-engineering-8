@@ -101,7 +101,7 @@ func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, err
 		u.noHp AS no_hp,
 		g.deskripsi AS description,
 		g.biaya AS fee,
-		g.rating,
+		g.ratting as rating,
 		p.pelajaran AS teaching_subject,
 		k.kategori AS teaching_category,
 		j.jenjang AS teaching_level
