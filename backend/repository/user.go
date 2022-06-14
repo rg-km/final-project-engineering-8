@@ -91,3 +91,66 @@ func (u *UserRepository) CheckAccount(username string, password string) (*User, 
 // 	return users, nil
 // 	// return []User{}, nil // TODO: replace this
 // }
+
+func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, error) {
+	sqlStmt := `
+	SELECT
+		u.UserID AS id,
+		u.nama AS name,
+		u.alamat AS address,
+		u.noHp AS no_hp,
+		g.deskripsi AS description,
+		g.biaya AS fee,
+		g.ratting as rating,
+		p.pelajaran AS teaching_subject,
+		k.kategori AS teaching_category,
+		j.jenjang AS teaching_level
+	FROM
+		info_guru AS g
+	JOIN USER AS u ON (g.UserID = u.UserID)
+	JOIN kategori AS k ON (g.KategoriID = k.KategoriID)
+	JOIN pelajaran AS p ON (g.PelajaranID = p.PelajaranID)
+	JOIN jenjang AS j ON (g.JenjangID = j.JenjangID)
+	LIMIT ?
+	OFFSET ?
+	`
+
+	rows, err := u.db.Query(sqlStmt, limit, offset)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+
+	teachers := []Teacher{}
+	for rows.Next() {
+		var teacher Teacher
+		err := rows.Scan(
+			&teacher.ID,
+			&teacher.Name,
+			&teacher.Address,
+			&teacher.NoHp,
+			&teacher.Description,
+			&teacher.Fee,
+			&teacher.Rating,
+			&teacher.TeachingSubject,
+			&teacher.TeachingCategory,
+			&teacher.TeachingLevel,
+		)
+		if err != nil {
+			return nil, err
+		}
+		teachers = append(teachers, teacher)
+	}
+	return teachers, nil
+}
+
+func (u *UserRepository) GetNumberofTeacherRow() (int, error) {
+	sqlStmt := `SELECT COUNT(*) from info_guru `
+	var total int
+	err := u.db.QueryRow(sqlStmt).Scan(&total)
+	if err != nil {
+		return total, err
+	}
+
+	return total, nil
+}
