@@ -159,6 +159,8 @@ func (api *API) GetTeachers(c *gin.Context) {
 		perPage int
 		offset  int
 		total   int
+		message string
+		isError bool
 	)
 
 	params := c.Request.URL.Query()
@@ -178,23 +180,39 @@ func (api *API) GetTeachers(c *gin.Context) {
 	}
 
 	// set default value for (optional) params
-	if perPage == 0 || page == 0 {
+	if perPage == 0 {
 		perPage = 50
+	}
+
+	if page == 0 {
 		page = 1
 	}
 
 	offset = (page - 1) * perPage
 
-	teachers, err := api.userRepo.FetchAllTeachers(perPage, offset)
-	total, err = api.userRepo.GetNumberofTeacherRow()
+	defer func() {
+		if isError {
+			c.JSON(http.StatusInternalServerError, Result{
+				Status:  false,
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to fetch teachers, ERROR: " + message,
+				Data:    nil,
+			})
+			return
+		}
+	}()
 
+	teachers, err := api.userRepo.FetchAllTeachers(perPage, offset)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, Result{
-			Status:  false,
-			Code:    http.StatusInternalServerError,
-			Message: "Failed to fetch teachers, " + err.Error(),
-			Data:    teachers,
-		})
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	total, err = api.userRepo.GetNumberofTeacherRow()
+	if err != nil {
+		isError = true
+		message = err.Error()
 		return
 	}
 
