@@ -9,7 +9,7 @@ SET UP
 3. Untuk menjalankan server jalankan main.go pada path \final-project\backend\main.go
    go run .\backend\main.go
 
-TESTING LOGIN
+MENJALANKAN LOGIN
 
 1. Jalankan server pada langkah SET UP nomor 3
 
@@ -29,7 +29,7 @@ TESTING LOGIN
 
 7. Jika Success maka akan menampilkan data ucup
 
-TESTING REGISTER
+MENJALANKAN REGISTER
 
 1. Jalankan server pada langkah SET UP nomor 3
 
@@ -53,7 +53,7 @@ TESTING REGISTER
 
 7. Jika akun user belum ada di database maka akan success tetapi jika sudah ada maka akan ada pesan error
 
-TESTING LOGOUT
+MENJALANKAN LOGOUT
 
 1. Jalankan server pada langkah SET UP nomor 3
 
