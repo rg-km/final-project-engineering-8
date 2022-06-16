@@ -22,7 +22,7 @@ func NewAPI(userRepo repo.UserRepository) *API {
 	gin.POST("/login", api.LoginUser)
 	gin.POST("/register", api.Register)
 	gin.POST("/logout", api.AuthMiddleWare(api.Logout))
-	gin.GET("/v1/teachers", api.AuthMiddleWare(api.GetTeachers))
+	gin.GET("/v1/teachers", api.AuthMiddleWare(api.MiddlewareSiswa(api.GetTeachers)))
 
 	return api
 }
