@@ -21,6 +21,7 @@ type Register struct {
 var jwtKey = []byte("key")
 
 type Claims struct {
+	ID       int64 `json:"id"`
 	Username string
 	Role     string
 	jwt.StandardClaims

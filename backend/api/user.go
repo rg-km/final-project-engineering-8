@@ -70,8 +70,9 @@ func (api *API) LoginUser(c *gin.Context) {
 	expirationTime := time.Now().Local().Add((5 * time.Minute))
 
 	claims := &Claims{
+		ID:       int64(dataUser.UserID),
 		Username: cred.Username,
-		Role:     "user",
+		Role:     dataUser.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -95,9 +96,10 @@ func (api *API) LoginUser(c *gin.Context) {
 	})
 
 	c.JSON(http.StatusOK, gin.H{
+		"status":  "true",
 		"code":    http.StatusOK,
 		"message": "login success",
-		"data":    dataUser,
+		"token":   tokenString,
 	})
 }
 
@@ -128,15 +130,6 @@ func (api *API) Register(c *gin.Context) {
 
 func (api *API) Logout(c *gin.Context) {
 	//logout
-	// _, err := c.Request.Cookie("token")
-	// fmt.Println(err)
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"code":    http.StatusUnauthorized,
-	// 		"message": "anda belum login",
-	// 	})
-	// 	return
-	// }
 	api.AllowOrigin(c)
 
 	http.SetCookie(c.Writer, &http.Cookie{
@@ -146,6 +139,7 @@ func (api *API) Logout(c *gin.Context) {
 	})
 
 	c.JSON(http.StatusOK, gin.H{
+		"status":  "true",
 		"code":    http.StatusOK,
 		"message": "logout success",
 	})
