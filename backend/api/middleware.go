@@ -10,7 +10,8 @@ import (
 
 func (api *API) AllowOrigin(c *gin.Context) {
 	c.Writer.Header().Set("Content-Type", "application/json")
-	c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080/")
+	// c.Writer.Header().Set("Access-Control-Allow-Origin", "http://localhost:8080/")
+	c.Writer.Header().Set("Access-Control-Allow-Origin", "*") //for development purpose
 	c.Writer.Header().Set("Access-Control-Max-Age", "86400")
 	c.Writer.Header().Set("Access-Control-Allow-Methods", "POST, GET, OPTIONS, PUT, DELETE, UPDATE")
 	c.Writer.Header().Set("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, X-Max")
@@ -134,4 +135,21 @@ func MiddlawareSiswa(c *gin.Context) error {
 		return err
 	}
 	return nil
+}
+
+func CORSMiddleware() gin.HandlerFunc {
+	return func(c *gin.Context) {
+
+		c.Header("Access-Control-Allow-Origin", "*")
+		c.Header("Access-Control-Allow-Credentials", "true")
+		c.Header("Access-Control-Allow-Headers", "Content-Type, Content-Length, Accept-Encoding, X-CSRF-Token, Authorization, accept, origin, Cache-Control, X-Requested-With")
+		c.Header("Access-Control-Allow-Methods", "POST,HEAD,PATCH, OPTIONS, GET, PUT")
+
+		if c.Request.Method == "OPTIONS" {
+			c.AbortWithStatus(204)
+			return
+		}
+
+		c.Next()
+	}
 }
