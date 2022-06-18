@@ -223,3 +223,61 @@ func (api *API) GetTeachers(c *gin.Context) {
 		},
 	})
 }
+
+func (api *API) UpdateTeacherById(c *gin.Context) {
+	api.AllowOrigin(c)
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(http.StatusInternalServerError, Result{
+				Status:  false,
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to update teacher, ERROR: " + message,
+				Data:    nil,
+			})
+			return
+		}
+	}()
+
+	payload, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: "Bad Request: " + message,
+			Data:    nil,
+		})
+
+		return
+	}
+
+	var teacherData map[string]interface{}
+	json.Unmarshal(payload, &teacherData)
+
+	err = api.userRepo.UpdateTeacher(id, teacherData)
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	updatedTeacher, err := api.userRepo.GetTeacherByID(id)
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    updatedTeacher,
+	})
+}

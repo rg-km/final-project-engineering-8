@@ -62,9 +62,9 @@ func CreateTableTest(db *sql.DB) (string, error) {
 		FOREIGN KEY (KategoriID) REFERENCES kategori(KategoriID)
 	);
 
-	INSERT INTO jenjang (jenjang) VALUES ("SD"), ("SMP"), ("SMA");
-	INSERT INTO pelajaran (pelajaran) VALUES ("Matematika"),("Bahasa Inggris");
-	INSERT INTO kategori (kategori) VALUES ("Anak Berkebutuhan Khusus"), ("Anak Non Berkebutuhan Khusus");
+	INSERT INTO jenjang (jenjang) VALUES ("SD"), ("SMP"), ("SMA"), ("Semua Kategori");
+	INSERT INTO pelajaran (pelajaran) VALUES ("Matematika"),("Bahasa Inggris"),("Kimia"),("Biologi"),("Fisika"),("Semua Mata Pelajaran");
+	INSERT INTO kategori (kategori) VALUES ("Anak Berkebutuhan Khusus"), ("Anak Non Berkebutuhan Khusus"),("Semua Kategori");
 
 	INSERT INTO user (username, password, nama, alamat, noHP,role) 
 	VALUES 

@@ -27,6 +27,7 @@ func NewAPI(userRepo repo.UserRepository) *API {
 	gin.POST("/register", api.Register)
 	gin.POST("/logout", api.AuthMiddleWare(api.Logout))
 	gin.GET("/v1/teachers", api.AuthMiddleWare(api.GetTeachers))
+	gin.PUT("v1/teacher/:id", api.AuthMiddleWare(api.UpdateTeacherById))
 
 	return api
 }
