@@ -1,6 +1,7 @@
 package repository
 
 import (
+	"context"
 	"database/sql"
 	"errors"
 )
@@ -153,4 +154,112 @@ func (u *UserRepository) GetNumberofTeacherRow() (int, error) {
 	}
 
 	return total, nil
+}
+
+func (u *UserRepository) UpdateTeacher(id string, teacher map[string]interface{}) error {
+	ctx := context.Background()
+	tx, err := u.db.BeginTx(ctx, nil)
+
+	if err != nil {
+		return err
+	}
+
+	defer tx.Rollback()
+
+	sqlStmt := `
+	UPDATE
+		user
+	SET
+		nama = ?,
+		alamat = ?,
+		noHp = ?
+	WHERE
+		user.UserID = ?;
+	`
+	_, err = tx.Exec(
+		sqlStmt,
+		teacher["name"],
+		teacher["address"],
+		teacher["no_hp"],
+		id,
+	)
+
+	if err != nil {
+		return errors.New("Data user dengan id tersebut tidak ditemukan")
+	}
+
+	sqlStmt = `
+	UPDATE
+		info_guru
+	SET
+		deskripsi = ?,
+		biaya = ?,
+		PelajaranID = ?,
+		JenjangID = ?,
+		KategoriID = ?
+	WHERE
+		UserID = ?;
+	`
+
+	_, err = tx.Exec(
+		sqlStmt,
+		teacher["description"],
+		teacher["fee"],
+		teacher["teaching_subject"],
+		teacher["teaching_level"],
+		teacher["teaching_category"],
+		id,
+	)
+
+	if err != nil {
+		return errors.New("Data guru dengan id tersebut tidak ditemukan")
+	}
+
+	tx.Commit()
+
+	return nil
+}
+
+func (u *UserRepository) GetTeacherByID(id string) (Teacher, error) {
+	var teacher Teacher
+
+	sqlStatement := `
+	SELECT
+		u.UserID AS id,
+		u.nama AS name,
+		u.alamat AS address,
+		u.noHp AS no_hp,
+		g.deskripsi AS description,
+		g.biaya AS fee,
+		g.ratting AS rating,
+		p.pelajaran AS teaching_subject,
+		k.kategori AS teaching_category,
+		j.jenjang AS teaching_level
+	FROM
+		info_guru AS g
+	JOIN USER AS u ON (g.UserID = u.UserID)
+	JOIN kategori AS k ON (g.KategoriID = k.KategoriID)
+	JOIN pelajaran AS p ON (g.PelajaranID = p.PelajaranID)
+	JOIN jenjang AS j ON (g.JenjangID = j.JenjangID)
+	WHERE u.UserID = ?
+	`
+
+	err := u.db.QueryRow(sqlStatement, id).Scan(
+		&teacher.ID,
+		&teacher.Name,
+		&teacher.Address,
+		&teacher.NoHp,
+		&teacher.Description,
+		&teacher.Fee,
+		&teacher.Rating,
+		&teacher.TeachingSubject,
+		&teacher.TeachingCategory,
+		&teacher.TeachingLevel,
+	)
+
+	if err != nil {
+		return teacher, err
+	}
+
+	return teacher, nil
 }
