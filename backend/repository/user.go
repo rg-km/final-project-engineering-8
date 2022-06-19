@@ -263,3 +263,29 @@ func (u *UserRepository) GetTeacherByID(id string) (Teacher, error) {
 
 	return teacher, nil
 }
+
+func (u *UserRepository) DeleteTeacherByUserID(id string) (code int, err error) {
+
+	ctx := context.Background()
+	tx, fail := u.db.BeginTx(ctx, nil)
+	if fail != nil {
+		return 500, fail
+	}
+
+	defer tx.Rollback()
+
+	sqlStatement := `DELETE FROM user WHERE user.UserID = ?`
+
+	if _, fail := tx.Exec(sqlStatement, id); fail != nil {
+		return 500, fail
+	}
+
+	sqlStatement = `DELETE FROM info_guru WHERE info_guru.UserID = ?`
+
+	if _, fail := tx.Exec(sqlStatement, id); fail != nil {
+		return 500, fail
+	}
+
+	tx.Commit()
+	return 200, nil
+}
