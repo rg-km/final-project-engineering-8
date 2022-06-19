@@ -15,10 +15,10 @@ func NewUserRepository(db *sql.DB) *UserRepository {
 	return &UserRepository{db: db}
 }
 
-func (u *UserRepository) LoginUser(username string, password string) (*User, error) {
-	sqlStatement := `SELECT * FROM user WHERE username = ? AND password = ?;`
+func (u *UserRepository) LoginUser(username string) (*User, error) {
+	sqlStatement := `SELECT * FROM user WHERE username = ?;`
 
-	rows, err := u.db.Query(sqlStatement, username, password)
+	rows, err := u.db.Query(sqlStatement, username)
 	if err != nil {
 		return nil, err
 	}

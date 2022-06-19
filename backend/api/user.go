@@ -8,6 +8,7 @@ import (
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (api *API) LoginUser(c *gin.Context) {
@@ -47,7 +48,7 @@ func (api *API) LoginUser(c *gin.Context) {
 		return
 	}
 
-	resp, err := api.userRepo.LoginUser(cred.Username, cred.Password)
+	resp, err := api.userRepo.LoginUser(cred.Username)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "false",
@@ -58,11 +59,12 @@ func (api *API) LoginUser(c *gin.Context) {
 	}
 	dataUser := *resp
 
-	if dataUser.Password != cred.Password {
+	if err := bcrypt.CompareHashAndPassword([]byte(dataUser.Password), []byte(cred.Password)); err != nil {
+		fmt.Println(dataUser.Password)
 		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
 			"status":  "false",
-			"message": "user credential invalid",
+			"code":    http.StatusUnauthorized,
+			"message": "password salah",
 		})
 		return
 	} else if dataUser.Username != cred.Username {
@@ -90,6 +92,7 @@ func (api *API) LoginUser(c *gin.Context) {
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
 			"code":    http.StatusInternalServerError,
 			"message": err.Error(),
 		})
@@ -120,7 +123,10 @@ func (api *API) StudentRegister(c *gin.Context) {
 		return
 	}
 	// register.Username = c.PostForm("username")
-	data, err := api.userRepo.StudentRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp)
+	password, _ := bcrypt.GenerateFromPassword([]byte(register.Password), 10)
+	strPassword := string(password)
+
+	data, err := api.userRepo.StudentRegister(register.Username, strPassword, register.Nama, register.Alamat, register.NoHp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "false",
@@ -148,6 +154,18 @@ func (api *API) TeacherRegister(c *gin.Context) {
 		return
 	}
 	// register.Username = c.PostForm("username")
+	password, err := HashPassword(register.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
+			"code":    http.StatusInternalServerError,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	register.Password = password
+
 	data, err := api.userRepo.TeacherRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Deskripsi, register.Biaya, register.JenjangID, register.PelajaranID, register.KategoriID)
 	fmt.Println(data)
 	fmt.Println(err)
@@ -166,6 +184,16 @@ func (api *API) TeacherRegister(c *gin.Context) {
 		"message": "registration success",
 		"data":    data,
 	})
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func (api *API) Logout(c *gin.Context) {
