@@ -281,3 +281,39 @@ func (api *API) UpdateTeacherById(c *gin.Context) {
 		Data:    updatedTeacher,
 	})
 }
+
+func (api *API) DeleteTeacher(c *gin.Context) {
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+		code    int
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(code, Result{
+				Status:  false,
+				Code:    code,
+				Message: message,
+				Data:    nil,
+			})
+		}
+	}()
+
+	code, err := api.userRepo.DeleteTeacherByUserID(id)
+
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    nil,
+	})
+}
