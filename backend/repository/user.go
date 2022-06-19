@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	// repo "github.com/rg-km/final-project-engineering-8/backend/repository"
 )
 
 type UserRepository struct {
@@ -33,7 +34,7 @@ func (u *UserRepository) LoginUser(username string, password string) (*User, err
 	return &user, nil
 }
 
-func (u *UserRepository) Register(username string, password string, nama string, alamat string, noHp string, role string) (*User, error) {
+func (u *UserRepository) StudentRegister(username string, password string, nama string, alamat string, noHp string) (*User, error) {
 	check, err := u.CheckAccount(username, password)
 
 	//check jika data sudah ada
@@ -44,12 +45,42 @@ func (u *UserRepository) Register(username string, password string, nama string,
 		//jika data belum ada
 		sqlStatement := `INSERT INTO user (username, password, nama, alamat, noHp, role) VALUES (?, ?, ?, ?, ?, ?);`
 
-		_, err = u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, role)
+		_, err = u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, "siswa")
 		if err != nil {
 			return nil, err
 		}
 
-		return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: role}, nil
+		return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: "siswa"}, nil
+	}
+}
+
+func (u *UserRepository) TeacherRegister(username string, password string, nama string, alamat string, noHp string, deskripsi string, biaya string, jenjangID int, pelajaranID int, kategoriID int) (*Teacher, error) {
+	check, _ := u.CheckAccount(username, password)
+
+	//check jika data sudah ada
+	if check.UserID != 0 {
+		err1 := errors.New("Akun sudah ada")
+		return nil, err1
+	} else {
+		//jika data belum ada
+		sqlStatement := `INSERT INTO user (username, password, nama, alamat, noHp, role) VALUES (?, ?, ?, ?, ?, ?);`
+
+		rows, err := u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, "guru")
+		if err != nil {
+			return nil, err
+		}
+
+		userID, _ := rows.LastInsertId()
+
+		sqlStatement2 := `INSERT INTO info_guru (deskripsi, biaya, ratting, userID, jenjangID, pelajaranID, kategoriID) VALUES (?, ?, ?, ?, ?, ?, ?);`
+
+		rows, err = u.db.Exec(sqlStatement2, deskripsi, biaya, "1", userID, jenjangID, pelajaranID, kategoriID)
+		if err != nil {
+			return nil, err
+		}
+
+		// return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: "guru"}, nil
+		return &Teacher{ID: int(userID), Name: nama, Address: alamat, NoHp: noHp, Description: deskripsi, Rating: "1", Fee: biaya, TeachingLevel: jenjangID, TeachingSubject: pelajaranID, TeachingCategory: kategoriID}, nil
 	}
 }
 

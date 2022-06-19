@@ -10,6 +10,17 @@ type User struct {
 	Role     string `json:"role"`
 }
 
+type InfoGuru struct {
+	InfoGuruID  int    `json:"info_guru_id"`
+	Deskripsi   string `json:"deskripsi"`
+	Biaya       string `json:"biaya"`
+	Ratting     string `json:"ratting"`
+	UserID      int    `json:"user_id"`
+	JenjangID   int    `json:"jenjang_id"`
+	PelajaranID int    `json:"pelajaran_id"`
+	KategoriID  int    `json:"kategori_id"`
+}
+
 type Teacher struct {
 	ID               int    `json:"id"`
 	Name             string `json:"name"`
@@ -18,7 +29,7 @@ type Teacher struct {
 	Description      string `json:"description"`
 	Fee              string `json:"fee"`
 	Rating           string `json:"rating"`
-	TeachingCategory string `json:"teaching_category"`
-	TeachingLevel    string `json:"teaching_level"`
-	TeachingSubject  string `json:"teaching_subject"`
+	TeachingCategory int    `json:"teaching_category"`
+	TeachingLevel    int    `json:"teaching_level"`
+	TeachingSubject  int    `json:"teaching_subject"`
 }

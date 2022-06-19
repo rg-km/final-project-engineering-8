@@ -17,6 +17,7 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	if err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{
+			"status":  "false",
 			"code":    http.StatusBadRequest,
 			"message": "Invalid request body",
 		})
@@ -25,18 +26,21 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	if cred.Username == "" && cred.Password == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
 			"code":    http.StatusUnauthorized,
 			"message": "username dan password tidak boleh kosong",
 		})
 		return
 	} else if cred.Username == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
 			"code":    http.StatusUnauthorized,
 			"message": "username tidak boleh kosong",
 		})
 		return
 	} else if cred.Password == "" {
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
 			"code":    http.StatusUnauthorized,
 			"message": "password tidak boleh kosong",
 		})
@@ -46,6 +50,7 @@ func (api *API) LoginUser(c *gin.Context) {
 	resp, err := api.userRepo.LoginUser(cred.Username, cred.Password)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
 			"code":    http.StatusInternalServerError,
 			"message": err.Error(),
 		})
@@ -56,11 +61,13 @@ func (api *API) LoginUser(c *gin.Context) {
 	if dataUser.Password != cred.Password {
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"code":    http.StatusUnauthorized,
+			"status":  "false",
 			"message": "user credential invalid",
 		})
 		return
 	} else if dataUser.Username != cred.Username {
 		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
 			"code":    http.StatusUnauthorized,
 			"message": "user credential invalid",
 		})
@@ -103,7 +110,7 @@ func (api *API) LoginUser(c *gin.Context) {
 	})
 }
 
-func (api *API) Register(c *gin.Context) {
+func (api *API) StudentRegister(c *gin.Context) {
 	api.AllowOrigin(c)
 	var register Register
 	if err := c.ShouldBindJSON(&register); err != nil {
@@ -113,9 +120,10 @@ func (api *API) Register(c *gin.Context) {
 		return
 	}
 	// register.Username = c.PostForm("username")
-	data, err := api.userRepo.Register(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Role)
+	data, err := api.userRepo.StudentRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp)
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
 			"code":    "500",
 			"message": err.Error(),
 		})
@@ -123,8 +131,40 @@ func (api *API) Register(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, gin.H{
-		"code": "200",
-		"data": data,
+		"status":  "true",
+		"code":    "200",
+		"message": "registration success",
+		"data":    data,
+	})
+}
+
+func (api *API) TeacherRegister(c *gin.Context) {
+	api.AllowOrigin(c)
+	var register Register
+	if err := c.ShouldBindJSON(&register); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	// register.Username = c.PostForm("username")
+	data, err := api.userRepo.TeacherRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Deskripsi, register.Biaya, register.JenjangID, register.PelajaranID, register.KategoriID)
+	fmt.Println(data)
+	fmt.Println(err)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
+			"code":    "500",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "true",
+		"code":    http.StatusOK,
+		"message": "registration success",
+		"data":    data,
 	})
 }
 
