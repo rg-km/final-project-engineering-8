@@ -78,63 +78,46 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 	}
 }
 
-func MiddlawareSiswa(c *gin.Context) error {
-	cookie, err := c.Cookie("token")
-	if err != nil {
-		if err == http.ErrNoCookie {
+func (api *API) MiddlewareSiswa(next gin.HandlerFunc) gin.HandlerFunc {
+	return func(c *gin.Context) {
+		api.AllowOrigin(c)
+		token, _ := c.Request.Cookie("token")
+
+		tknStr := token.Value
+
+		claims := &Claims{}
+
+		_, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
+			return jwtKey, nil
+		})
+
+		if err != nil {
+			if err == jwt.ErrSignatureInvalid {
+				c.Writer.WriteHeader(http.StatusUnauthorized)
+				c.JSON(http.StatusUnauthorized, gin.H{
+					"code":    http.StatusUnauthorized,
+					"message": err.Error(),
+				})
+				return
+			}
+			c.Writer.WriteHeader(http.StatusBadRequest)
 			c.JSON(http.StatusUnauthorized, gin.H{
 				"code":    http.StatusUnauthorized,
-				"message": "unauthorized",
+				"message": err.Error(),
 			})
-			return err
+			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "token not found",
-		})
-		return err
-	}
 
-	// tknStr := cookie.Value
-
-	claims := &Claims{}
-
-	token, err := jwt.ParseWithClaims(cookie, &Claims{}, func(token *jwt.Token) (interface{}, error) {
-		return jwtKey, nil
-	})
-
-	if err != nil {
-		if err == jwt.ErrSignatureInvalid {
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"code":    http.StatusUnauthorized,
-				"message": "unauthorized",
+		if claims.Role != "siswa" {
+			c.Writer.WriteHeader(http.StatusForbidden)
+			c.JSON(http.StatusForbidden, gin.H{
+				"code":    http.StatusForbidden,
+				"message": "forbidden access",
 			})
-			return err
+			return
 		}
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "token not found",
-		})
-		return err
+		next(c)
 	}
-
-	if !token.Valid {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "token expired",
-		})
-		return err
-	}
-
-	claims = token.Claims.(*Claims)
-	if claims.Role != "siswa" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "unauthorized",
-		})
-		return err
-	}
-	return nil
 }
 
 func CORSMiddleware() gin.HandlerFunc {
