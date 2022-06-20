@@ -177,7 +177,7 @@ func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, err
 }
 
 func (u *UserRepository) GetNumberofTeacherRow() (int, error) {
-	sqlStmt := `SELECT COUNT(*) from info_guru `
+	sqlStmt := `SELECT COUNT(*) FROM info_guru`
 	var total int
 	err := u.db.QueryRow(sqlStmt).Scan(&total)
 	if err != nil {
