@@ -4,6 +4,7 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strconv"
 	// repo "github.com/rg-km/final-project-engineering-8/backend/repository"
 )
 
@@ -79,8 +80,13 @@ func (u *UserRepository) TeacherRegister(username string, password string, nama 
 			return nil, err
 		}
 
+		teacher, err := u.GetTeacherByID(strconv.Itoa(int(userID)))
+		if err != nil {
+			return nil, err
+		}
+
 		// return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: "guru"}, nil
-		return &Teacher{ID: int(userID), Name: nama, Address: alamat, NoHp: noHp, Description: deskripsi, Rating: "1", Fee: biaya, TeachingLevel: jenjangID, TeachingSubject: pelajaranID, TeachingCategory: kategoriID}, nil
+		return &teacher, nil
 	}
 }
 
@@ -177,7 +183,7 @@ func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, err
 }
 
 func (u *UserRepository) GetNumberofTeacherRow() (int, error) {
-	sqlStmt := `SELECT COUNT(*) from info_guru `
+	sqlStmt := `SELECT COUNT(*) FROM info_guru`
 	var total int
 	err := u.db.QueryRow(sqlStmt).Scan(&total)
 	if err != nil {

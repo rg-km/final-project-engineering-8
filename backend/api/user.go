@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"fmt"
+	"math"
 	"net/http"
 	"time"
 
@@ -278,6 +279,11 @@ func (api *API) GetTeachers(c *gin.Context) {
 		return
 	}
 
+	totalPage := 1
+	if total > perPage {
+		totalPage = int(math.Ceil(float64(total) / float64(perPage)))
+	}
+
 	c.JSON(http.StatusOK, Result{
 		Status:  true,
 		Code:    http.StatusOK,
@@ -287,7 +293,7 @@ func (api *API) GetTeachers(c *gin.Context) {
 			Total:     total,
 			Page:      page,
 			PerPage:   perPage,
-			TotalPage: 10,
+			TotalPage: totalPage,
 		},
 	})
 }
