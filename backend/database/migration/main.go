@@ -4,11 +4,10 @@ import (
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
-	con "github.com/rg-km/final-project-engineering-8/backend/database/connection"
 )
 
 func main() {
-	db, err := con.ConnectSQLite()
+	db, err := sql.Open("sqlite3", "../final_project.db")
 	if err != nil {
 		panic(err)
 	}
