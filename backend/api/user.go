@@ -60,7 +60,7 @@ func (api *API) LoginUser(c *gin.Context) {
 	dataUser := *resp
 
 	if err := bcrypt.CompareHashAndPassword([]byte(dataUser.Password), []byte(cred.Password)); err != nil {
-		fmt.Println(dataUser.Password)
+
 		c.JSON(http.StatusUnauthorized, gin.H{
 			"status":  "false",
 			"code":    http.StatusUnauthorized,
@@ -105,6 +105,7 @@ func (api *API) LoginUser(c *gin.Context) {
 		Expires: expirationTime,
 	})
 
+	c.Header("Authorization", "Bearer "+tokenString)
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "true",
 		"code":    http.StatusOK,
@@ -167,8 +168,7 @@ func (api *API) TeacherRegister(c *gin.Context) {
 	register.Password = password
 
 	data, err := api.userRepo.TeacherRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Deskripsi, register.Biaya, register.JenjangID, register.PelajaranID, register.KategoriID)
-	fmt.Println(data)
-	fmt.Println(err)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{
 			"status":  "false",

@@ -29,6 +29,18 @@ type Teacher struct {
 	Description      string `json:"description"`
 	Fee              string `json:"fee"`
 	Rating           string `json:"rating"`
+	TeachingCategory string `json:"teaching_category"`
+	TeachingLevel    string `json:"teaching_level"`
+	TeachingSubject  string `json:"teaching_subject"`
+}
+type TeacherRegister struct {
+	ID               int    `json:"id"`
+	Name             string `json:"name"`
+	Address          string `json:"address"`
+	NoHp             string `json:"no_hp"`
+	Description      string `json:"description"`
+	Fee              string `json:"fee"`
+	Rating           string `json:"rating"`
 	TeachingCategory int    `json:"teaching_category"`
 	TeachingLevel    int    `json:"teaching_level"`
 	TeachingSubject  int    `json:"teaching_subject"`

@@ -35,7 +35,7 @@ func (u *UserRepository) LoginUser(username string) (*User, error) {
 }
 
 func (u *UserRepository) StudentRegister(username string, password string, nama string, alamat string, noHp string) (*User, error) {
-	check, err := u.CheckAccount(username, password)
+	check, err := u.CheckAccount(username)
 
 	//check jika data sudah ada
 	if check.UserID != 0 {
@@ -54,8 +54,8 @@ func (u *UserRepository) StudentRegister(username string, password string, nama 
 	}
 }
 
-func (u *UserRepository) TeacherRegister(username string, password string, nama string, alamat string, noHp string, deskripsi string, biaya string, jenjangID int, pelajaranID int, kategoriID int) (*Teacher, error) {
-	check, _ := u.CheckAccount(username, password)
+func (u *UserRepository) TeacherRegister(username string, password string, nama string, alamat string, noHp string, deskripsi string, biaya string, jenjangID int, pelajaranID int, kategoriID int) (*TeacherRegister, error) {
+	check, _ := u.CheckAccount(username)
 
 	//check jika data sudah ada
 	if check.UserID != 0 {
@@ -80,14 +80,14 @@ func (u *UserRepository) TeacherRegister(username string, password string, nama 
 		}
 
 		// return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: "guru"}, nil
-		return &Teacher{ID: int(userID), Name: nama, Address: alamat, NoHp: noHp, Description: deskripsi, Rating: "1", Fee: biaya, TeachingLevel: jenjangID, TeachingSubject: pelajaranID, TeachingCategory: kategoriID}, nil
+		return &TeacherRegister{ID: int(userID), Name: nama, Address: alamat, NoHp: noHp, Description: deskripsi, Rating: "1", Fee: biaya, TeachingLevel: jenjangID, TeachingSubject: pelajaranID, TeachingCategory: kategoriID}, nil
 	}
 }
 
-func (u *UserRepository) CheckAccount(username string, password string) (*User, error) {
-	sqlStatement := `SELECT * FROM user WHERE username = ? AND password = ?;`
+func (u *UserRepository) CheckAccount(username string) (*User, error) {
+	sqlStatement := `SELECT * FROM user WHERE username = ?;`
 
-	rows, err := u.db.Query(sqlStatement, username, password)
+	rows, err := u.db.Query(sqlStatement, username)
 	if err != nil {
 		return nil, err
 	}
