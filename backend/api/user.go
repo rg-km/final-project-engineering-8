@@ -5,6 +5,8 @@ import (
 	"fmt"
 	"math"
 	"net/http"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -420,5 +422,111 @@ func (api *API) GetTeacherByUserID(c *gin.Context) {
 		Code:    http.StatusOK,
 		Message: "Success",
 		Data:    teacher,
+	})
+}
+
+func (api *API) GetStudentLogin(c *gin.Context) {
+	var token string
+	authHeader := c.Request.Header.Get("Authorization")
+	bearerToken := strings.Split(authHeader, " ")
+	if len(bearerToken) == 2 {
+		token = bearerToken[1]
+	} else {
+		token = ""
+	}
+
+	if token == "" {
+		c.JSON(401, gin.H{
+			"status":  401,
+			"message": "Token Not Valid",
+		})
+		return
+	}
+	claims := &Claims{}
+
+	parseTkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"status":  "false",
+				"code":    http.StatusUnauthorized,
+				"message": err.Error(),
+			})
+			return
+		}
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
+			"code":    http.StatusUnauthorized,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	if !parseTkn.Valid {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
+			"code":    http.StatusUnauthorized,
+			"message": "token invalid!",
+		})
+		return
+	}
+
+	username := claims.Username
+	student, err := api.userRepo.GetStudentProfile(username)
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, gin.H{
+			"status":  "false",
+			"code":    http.StatusUnauthorized,
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    student,
+	})
+}
+
+func (api *API) UpdateStudentById(c *gin.Context) {
+	api.AllowOrigin(c)
+	var user Users
+	id := c.Param("id")
+
+	convertIDInt, _ := strconv.Atoi(id)
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	strPassword := string(password)
+	data, err := api.userRepo.UpdateStudentById(convertIDInt, user.Username, strPassword, user.Nama, user.Alamat, user.NoHp)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{
+			"status":  "false",
+			"code":    "500",
+			"message": err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, gin.H{
+		"status":  "true",
+		"code":    "200",
+		"message": "update successfully",
+		"data":    data,
 	})
 }

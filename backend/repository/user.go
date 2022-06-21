@@ -103,6 +103,25 @@ func (u *UserRepository) CheckAccount(username string) (*User, error) {
 	return &user, nil
 }
 
+func (u *UserRepository) CheckAccountUpdate(username string, userID int) (*User, error) {
+	sqlStatement := `SELECT * FROM user WHERE username = ? AND NOT userID = ?;`
+
+	rows, err := u.db.Query(sqlStatement, username, userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var user User
+	for rows.Next() {
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}
+
 // func (u *UserRepository) FetchAllUsers() ([]User, error) {
 // 	sqlStmt := `SELECT id, username, password, role, loggedin FROM users`
 // 	rows, err := u.db.Query(sqlStmt)
@@ -319,4 +338,44 @@ func (u *UserRepository) DeleteTeacherByUserID(id string) (code int, err error) 
 
 	tx.Commit()
 	return 200, nil
+}
+
+func (u *UserRepository) GetStudentProfile(username string) (*User, error) {
+	sqlStatement := `SELECT * FROM user WHERE username = ?;`
+
+	rows, err := u.db.Query(sqlStatement, username)
+	if err != nil {
+		return nil, err
+	}
+
+	var user User
+	for rows.Next() {
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		if err != nil {
+			return nil, err
+		}
+	}
+
+	return &user, nil
+}
+
+func (u *UserRepository) UpdateStudentById(userId int, username string, password string, nama string, alamat string, noHp string) (*User, error) {
+	check, _ := u.CheckAccountUpdate(username, userId)
+
+	//check jika data sudah ada
+	if check.UserID != 0 {
+		err1 := errors.New("Akun sudah ada")
+		return nil, err1
+	} else {
+
+		sqlStatement := `UPDATE user SET username = ?, password = ?, nama = ?, alamat = ?, noHp = ? WHERE userId = ?;`
+
+		_, err := u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, userId)
+		if err != nil {
+			return nil, err
+		}
+
+		return u.GetStudentProfile(username)
+	}
+
 }
