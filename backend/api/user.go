@@ -201,11 +201,7 @@ func (api *API) Logout(c *gin.Context) {
 	//logout
 	api.AllowOrigin(c)
 
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:    "token",
-		Value:   "",
-		Expires: time.Unix(0, 0),
-	})
+	c.Header("Authorization", "")
 
 	c.JSON(http.StatusOK, gin.H{
 		"status":  "true",

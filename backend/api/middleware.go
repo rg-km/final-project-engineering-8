@@ -98,6 +98,15 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 		api.AllowOrigin(c)
 		var token string
 		authHeader := c.Request.Header.Get("Authorization")
+		if authHeader == "" {
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, gin.H{
+				"status":  "false",
+				"code":    http.StatusUnauthorized,
+				"message": "anda belum login",
+			})
+			return
+		}
 		bearerToken := strings.Split(authHeader, " ")
 		if len(bearerToken) == 2 {
 			token = bearerToken[1]
