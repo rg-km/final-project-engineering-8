@@ -387,3 +387,38 @@ func (api *API) DeleteTeacher(c *gin.Context) {
 		Data:    nil,
 	})
 }
+
+func (api *API) GetTeacherByUserID(c *gin.Context) {
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(http.StatusInternalServerError, Result{
+				Status:  false,
+				Code:    http.StatusInternalServerError,
+				Message: message,
+				Data:    nil,
+			})
+		}
+	}()
+
+	teacher, err := api.userRepo.GetTeacherByID(id)
+
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    teacher,
+	})
+}
