@@ -3,6 +3,7 @@ package api_test
 import (
 	"bytes"
 	"database/sql"
+	"fmt"
 	"net/http"
 	"net/http/httptest"
 
@@ -21,21 +22,27 @@ var _ = Describe("Api", func() {
 		if err != nil {
 			panic(err)
 		}
-		defer db.Close()
 
 		userRepo := repo.NewUserRepository(db)
 		mainApi = api.NewAPI(*userRepo)
+
 	})
 
 	Describe("/login", func() {
 		When("login with valid credentials", func() {
 			It("should return 200", func() {
-				user := `{"username":"ruli","password":"ruli123"}`
+				user := `
+				{
+					"username": "ruli",
+					"password": "ruli123"
+				}
+				`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
 					panic(err)
 				}
+				fmt.Println("RESP", resp)
 				mainApi.Handler().ServeHTTP(resp, req)
 				req.Header.Set("Content-Type", "application/json")
 				Expect(resp.Code).To(Equal(http.StatusOK))

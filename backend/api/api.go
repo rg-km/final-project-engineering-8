@@ -1,12 +1,7 @@
 package api
 
 import (
-	"fmt"
-	"log"
-	"os"
-
 	"github.com/gin-gonic/gin"
-	"github.com/joho/godotenv"
 	repo "github.com/rg-km/final-project-engineering-8/backend/repository"
 )
 
@@ -43,20 +38,20 @@ func (api *API) Handler() *gin.Engine {
 }
 
 func (api *API) Start() {
-	err := godotenv.Load(".env")
+	// err := godotenv.Load(".env")
 
-	if err != nil {
-		log.Fatalf("Error loading .env file. ERROR:", err)
-	}
-	// port := os.Getenv("PORT")
-
-	// if port == "" {
-	// 	log.Fatal("$PORT must be set")
+	// if err != nil {
+	// 	log.Fatalf("Error loading .env file. ERROR:", err)
 	// }
+	// // port := os.Getenv("PORT")
 
-	HOST := os.Getenv("API_HOST")
-	PORT := os.Getenv("API_PORT")
+	// // if port == "" {
+	// // 	log.Fatal("$PORT must be set")
+	// // }
 
-	fmt.Printf("starting web server at http://%v:%v/", HOST, PORT)
-	api.Handler().Run(":" + PORT)
+	// HOST := os.Getenv("API_HOST")
+	// PORT := os.Getenv("API_PORT")
+
+	// fmt.Printf("starting web server at http://%v:%v/", HOST, PORT)
+	api.Handler().Run(":" + "8080")
 }
