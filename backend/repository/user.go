@@ -386,3 +386,11 @@ func (u *UserRepository) UpdateStudentById(userId int, username string, password
 	}
 
 }
+
+func (u *UserRepository) DeleteUserByID(id int) (code int, err error) {
+	sqlStatement := `DELETE FROM user WHERE user.UserID = ?`
+	if _, err := u.db.Exec(sqlStatement, id); err != nil {
+		return 500, nil
+	}
+	return 200, nil
+}
