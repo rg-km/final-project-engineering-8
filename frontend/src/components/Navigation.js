@@ -22,7 +22,7 @@ function Navigation() {
                 <Navbar.Collapse id="responsive-navbar-nav">
                     <Nav className="me-auto">
                         <Nav.Link href={'/home'}>Home</Nav.Link>
-                        <Nav.Link href="#pricing">Pricing</Nav.Link>
+                        <Nav.Link href="#tentang">Tentang</Nav.Link>
                     </Nav>
                     <Nav>
                         {!auth ?

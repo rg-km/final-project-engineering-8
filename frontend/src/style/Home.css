@@ -1,0 +1,66 @@
+.bg-white {
+    background-color: white;
+}
+
+.card {
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2);
+    transition: 0.3s;
+    margin: 10px;
+    padding: 20px;
+    border: none;
+}
+
+.card-fitur {
+    background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%);
+    border-radius: 20px;
+
+}
+
+img.animated-gif {
+    width: 100%;
+    height: auto;
+    animation-duration: 1000s;
+}
+
+.teaching-level {
+    background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%);
+    padding: 5px;
+    width: 50px;
+    align-items: right;
+    border-radius: 15px;
+    margin-bottom: 10px;
+}
+
+.teaching-category {
+    font-size: 12px;
+    /* background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%); */
+    padding: 4px;
+
+}
+
+.rating {
+    color: orange;
+    font-weight: bold;
+}
+
+.caption {
+    display: inline-block;
+    align-self: flex-end;
+    margin-bottom: 25px;
+}
+
+.card-fitur p {
+    font-size: 13px;
+    min-height: 10px;
+    margin: 0;
+    padding: 0;
+}
+
+.wrap-teacher>*:hover {
+    transition: transform .3s;
+    transform: translateY(-16px);
+}
+
+.jumbotron {
+    background-color: #E9ECEF;
+}
