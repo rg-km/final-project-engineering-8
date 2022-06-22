@@ -1,6 +1,6 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
-import './LoginRegister.css'
+import '../style/LoginRegister.css'
 import image from '../images/login.svg'
 import { useNavigate } from 'react-router-dom'
 
