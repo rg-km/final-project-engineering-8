@@ -20,43 +20,43 @@ func (api *API) LoginUser(c *gin.Context) {
 	err := json.NewDecoder(c.Request.Body).Decode(&cred)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"status":  "false",
-			"code":    http.StatusBadRequest,
-			"message": "Invalid request body",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "Invalid request body",
 		})
 		return
 	}
 
 	if cred.Username == "" && cred.Password == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "username dan password tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "username dan password tidak boleh kosong",
 		})
 		return
 	} else if cred.Username == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "username tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "username tidak boleh kosong",
 		})
 		return
 	} else if cred.Password == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "password tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "password tidak boleh kosong",
 		})
 		return
 	}
 
 	resp, err := api.userRepo.LoginUser(cred.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -64,17 +64,17 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	if err := bcrypt.CompareHashAndPassword([]byte(dataUser.Password), []byte(cred.Password)); err != nil {
 
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "password salah",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "password salah",
 		})
 		return
 	} else if dataUser.Username != cred.Username {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "user credential invalid",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "user credential invalid",
 		})
 		return
 	}
@@ -94,10 +94,10 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: "password tidak boleh kosong",
 		})
 		return
 	}
@@ -110,8 +110,11 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	c.Header("Authorization", "Bearer "+tokenString)
 	c.JSON(http.StatusOK, gin.H{
-		"status":  "true",
+		"status":  true,
 		"code":    http.StatusOK,
+		"id":      dataUser.UserID,
+		"name":    dataUser.Nama,
+		"role":    dataUser.Role,
 		"message": "login success",
 		"token":   tokenString,
 	})
@@ -132,19 +135,19 @@ func (api *API) StudentRegister(c *gin.Context) {
 
 	data, err := api.userRepo.StudentRegister(register.Username, strPassword, register.Nama, register.Alamat, register.NoHp)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    "500",
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "true",
-		"code":    "200",
-		"message": "registration success",
-		"data":    data,
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "registration success",
+		Data:    data,
 	})
 }
 
@@ -160,10 +163,10 @@ func (api *API) TeacherRegister(c *gin.Context) {
 	// register.Username = c.PostForm("username")
 	password, err := HashPassword(register.Password)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -173,19 +176,18 @@ func (api *API) TeacherRegister(c *gin.Context) {
 	data, err := api.userRepo.TeacherRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Deskripsi, register.Biaya, register.JenjangID, register.PelajaranID, register.KategoriID)
 
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    "500",
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
-
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "true",
-		"code":    http.StatusOK,
-		"message": "registration success",
-		"data":    data,
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "registration success",
+		Data:    data,
 	})
 }
 
@@ -205,10 +207,10 @@ func (api *API) Logout(c *gin.Context) {
 
 	c.Header("Authorization", "")
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "true",
-		"code":    http.StatusOK,
-		"message": "logout success",
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "logout success",
 	})
 }
 
@@ -437,7 +439,8 @@ func (api *API) GetStudentLogin(c *gin.Context) {
 
 	if token == "" {
 		c.JSON(401, gin.H{
-			"status":  401,
+			"status":  false,
+			"code":    401,
 			"message": "Token Not Valid",
 		})
 		return
@@ -451,28 +454,28 @@ func (api *API) GetStudentLogin(c *gin.Context) {
 	if err != nil {
 		if err == jwt.ErrSignatureInvalid {
 			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": err.Error(),
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
 			})
 			return
 		}
 		c.Writer.WriteHeader(http.StatusBadRequest)
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": err.Error(),
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
 		})
 		return
 	}
 
 	if !parseTkn.Valid {
 		c.Writer.WriteHeader(http.StatusUnauthorized)
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": "token invalid!",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "token invalid!",
 		})
 		return
 	}
@@ -481,10 +484,10 @@ func (api *API) GetStudentLogin(c *gin.Context) {
 	student, err := api.userRepo.GetStudentProfile(username)
 	if err != nil {
 		c.Writer.WriteHeader(http.StatusUnauthorized)
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"status":  "false",
-			"code":    http.StatusUnauthorized,
-			"message": err.Error(),
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
 		})
 		return
 	}
@@ -515,18 +518,18 @@ func (api *API) UpdateStudentById(c *gin.Context) {
 	strPassword := string(password)
 	data, err := api.userRepo.UpdateStudentById(convertIDInt, user.Username, strPassword, user.Nama, user.Alamat, user.NoHp)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"status":  "false",
-			"code":    "500",
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"status":  "true",
-		"code":    "200",
-		"message": "update successfully",
-		"data":    data,
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "update successfully",
+		Data:    data,
 	})
 }
