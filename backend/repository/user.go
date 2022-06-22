@@ -7,6 +7,8 @@ import (
 	// repo "github.com/rg-km/final-project-engineering-8/backend/repository"
 )
 
+var DefaultProfilePict = "https://halloguru.herokuapp.com/bucket-image/halloguru/1655885462662157252.png"
+
 type UserRepository struct {
 	db *sql.DB
 }
@@ -25,7 +27,7 @@ func (u *UserRepository) LoginUser(username string) (*User, error) {
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role, &user.ProfilePict)
 		if err != nil {
 			return nil, err
 		}
@@ -50,7 +52,7 @@ func (u *UserRepository) StudentRegister(username string, password string, nama 
 			return nil, err
 		}
 
-		return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, Role: "siswa"}, nil
+		return &User{Username: username, Password: password, Nama: nama, Alamat: alamat, NoHp: noHp, ProfilePict: DefaultProfilePict, Role: "siswa"}, nil
 	}
 }
 
@@ -94,7 +96,7 @@ func (u *UserRepository) CheckAccount(username string) (*User, error) {
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
 		if err != nil {
 			return nil, err
 		}
@@ -113,7 +115,7 @@ func (u *UserRepository) CheckAccountUpdate(username string, userID int) (*User,
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
 		if err != nil {
 			return nil, err
 		}
@@ -150,6 +152,7 @@ func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, err
 		u.nama AS name,
 		u.alamat AS address,
 		u.noHp AS no_hp,
+		u.profilePict AS profile_pict,
 		g.deskripsi AS description,
 		g.biaya AS fee,
 		g.ratting as rating,
@@ -180,6 +183,7 @@ func (u *UserRepository) FetchAllTeachers(limit int, offset int) ([]Teacher, err
 			&teacher.Name,
 			&teacher.Address,
 			&teacher.NoHp,
+			&teacher.ProfilePict,
 			&teacher.Description,
 			&teacher.Fee,
 			&teacher.Rating,
@@ -222,7 +226,8 @@ func (u *UserRepository) UpdateTeacher(id string, teacher map[string]interface{}
 	SET
 		nama = ?,
 		alamat = ?,
-		noHp = ?
+		noHp = ?,
+		profilePict = ?
 	WHERE
 		user.UserID = ?;
 	`
@@ -231,11 +236,12 @@ func (u *UserRepository) UpdateTeacher(id string, teacher map[string]interface{}
 		teacher["name"],
 		teacher["address"],
 		teacher["no_hp"],
+		teacher["profile_pict"],
 		id,
 	)
 
 	if err != nil {
-		return errors.New("Data user dengan id tersebut tidak ditemukan")
+		return err
 	}
 
 	sqlStmt = `
@@ -262,7 +268,7 @@ func (u *UserRepository) UpdateTeacher(id string, teacher map[string]interface{}
 	)
 
 	if err != nil {
-		return errors.New("Data guru dengan id tersebut tidak ditemukan")
+		return err
 	}
 
 	tx.Commit()
@@ -279,6 +285,7 @@ func (u *UserRepository) GetTeacherByID(id string) (Teacher, error) {
 		u.nama AS name,
 		u.alamat AS address,
 		u.noHp AS no_hp,
+		u.profilePict AS profile_pict,
 		g.deskripsi AS description,
 		g.biaya AS fee,
 		g.ratting AS rating,
@@ -293,12 +300,12 @@ func (u *UserRepository) GetTeacherByID(id string) (Teacher, error) {
 	JOIN jenjang AS j ON (g.JenjangID = j.JenjangID)
 	WHERE u.UserID = ?
 	`
-
 	err := u.db.QueryRow(sqlStatement, id).Scan(
 		&teacher.ID,
 		&teacher.Name,
 		&teacher.Address,
 		&teacher.NoHp,
+		&teacher.ProfilePict,
 		&teacher.Description,
 		&teacher.Fee,
 		&teacher.Rating,
@@ -350,7 +357,7 @@ func (u *UserRepository) GetStudentProfile(username string) (*User, error) {
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
 		if err != nil {
 			return nil, err
 		}

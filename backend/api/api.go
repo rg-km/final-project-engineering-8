@@ -11,6 +11,7 @@ type API struct {
 }
 
 func NewAPI(userRepo repo.UserRepository) *API {
+	// gin.SetMode(gin.ReleaseMode)
 	gin := gin.Default()
 	gin.Use(CORSMiddleware())
 	api := &API{

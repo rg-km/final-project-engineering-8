@@ -28,7 +28,8 @@ func CreateTableTest(db *sql.DB) (string, error) {
 		nama varchar(255) not null,
 		alamat varchar(255) not null,
 		noHp varchar(255) not null,
-		role varchar(255) not null
+		role varchar(255) not null,
+		profilePict TEXT NOT NULL DEFAULT "https://halloguru.herokuapp.com/bucket-image/halloguru/1655885462662157252.png")
 	);
 
 	CREATE TABLE IF NOT EXISTS jenjang (

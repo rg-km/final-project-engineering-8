@@ -1,10 +1,13 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"math"
 	"net/http"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -110,13 +113,14 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	c.Header("Authorization", "Bearer "+tokenString)
 	c.JSON(http.StatusOK, gin.H{
-		"status":  true,
-		"code":    http.StatusOK,
-		"id":      dataUser.UserID,
-		"name":    dataUser.Nama,
-		"role":    dataUser.Role,
-		"message": "login success",
-		"token":   tokenString,
+		"status":       true,
+		"code":         http.StatusOK,
+		"id":           dataUser.UserID,
+		"name":         dataUser.Nama,
+		"role":         dataUser.Role,
+		"profile_pict": dataUser.ProfilePict,
+		"message":      "login success",
+		"token":        tokenString,
 	})
 }
 
@@ -331,8 +335,30 @@ func (api *API) UpdateTeacherById(c *gin.Context) {
 		return
 	}
 
-	var teacherData map[string]interface{}
+	teacherData := make(map[string]interface{})
 	json.Unmarshal(payload, &teacherData)
+
+	if teacherData["profile_pict"] != nil {
+
+		isLinkFormat := CheckIsLinkFormat(teacherData["profile_pict"].(string))
+
+		if !isLinkFormat {
+			// Jika bukan link, berarti base64 string
+			// Maka store base64 ke image bucket untuk generate link
+			generatedLink, err := StoreBase64ToBucketImage(teacherData["profile_pict"].(string))
+			fmt.Println("Generated Link ==>", generatedLink)
+
+			if err != nil {
+				isError = true
+				message = err.Error()
+				return
+			}
+
+			// pass generated link to payload
+			teacherData["profile_pict"] = generatedLink
+		}
+
+	}
 
 	err = api.userRepo.UpdateTeacher(id, teacherData)
 	if err != nil {
@@ -532,4 +558,39 @@ func (api *API) UpdateStudentById(c *gin.Context) {
 		Message: "update successfully",
 		Data:    data,
 	})
+}
+
+func CheckIsLinkFormat(text string) bool {
+	regex, _ := regexp.Compile(`http(s*)://`)
+	return regex.MatchString(text)
+}
+
+func StoreBase64ToBucketImage(base64String string) (generatedLink string, err error) {
+	client := &http.Client{}
+
+	var jsonPayload = []byte(fmt.Sprintf("{\"image\": \"%s\"}", base64String))
+	r, fail := http.NewRequest("POST", "https://halloguru.herokuapp.com/v1/image", bytes.NewBuffer(jsonPayload))
+	r.Header.Set("Content-Type", "application/json")
+
+	resp, _ := client.Do(r)
+	if fail != nil {
+		return generatedLink, fail
+	}
+
+	defer resp.Body.Close()
+
+	var body map[string]interface{}
+	fail = json.NewDecoder(resp.Body).Decode(&body)
+
+	if fail != nil {
+		return generatedLink, fail
+	}
+
+	if resp.StatusCode != 200 {
+		return generatedLink, errors.New(fmt.Sprint("Failed store image to bucket, ERROR: ", body["message"]))
+	}
+
+	fmt.Println("Response ==>", body)
+
+	return body["link"].(string), nil
 }
