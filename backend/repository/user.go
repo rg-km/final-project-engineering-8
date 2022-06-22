@@ -96,7 +96,7 @@ func (u *UserRepository) CheckAccount(username string) (*User, error) {
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role, &user.ProfilePict)
 		if err != nil {
 			return nil, err
 		}
@@ -115,7 +115,7 @@ func (u *UserRepository) CheckAccountUpdate(username string, userID int) (*User,
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role, &user.ProfilePict)
 		if err != nil {
 			return nil, err
 		}
@@ -357,7 +357,7 @@ func (u *UserRepository) GetStudentProfile(username string) (*User, error) {
 
 	var user User
 	for rows.Next() {
-		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.ProfilePict, &user.Role)
+		err = rows.Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role, &user.ProfilePict)
 		if err != nil {
 			return nil, err
 		}
