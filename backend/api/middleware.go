@@ -100,10 +100,11 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 		authHeader := c.Request.Header.Get("Authorization")
 		if authHeader == "" {
 			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": "anda belum login",
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: "anda belum login",
 			})
 			return
 		}
@@ -116,7 +117,8 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 
 		if token == "" {
 			c.JSON(401, gin.H{
-				"status":  401,
+				"status":  false,
+				"code":    401,
 				"message": "Token Not Valid",
 			})
 			return
@@ -130,28 +132,31 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
 				c.Writer.WriteHeader(http.StatusUnauthorized)
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"status":  "false",
-					"code":    http.StatusUnauthorized,
-					"message": err.Error(),
+
+				c.JSON(http.StatusUnauthorized, Result{
+					Status:  false,
+					Code:    http.StatusUnauthorized,
+					Message: err.Error(),
 				})
 				return
 			}
 			c.Writer.WriteHeader(http.StatusBadRequest)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": err.Error(),
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
 			})
 			return
 		}
 
 		if !parseTkn.Valid {
 			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": "token invalid!",
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: "token invalid!",
 			})
 			return
 		}
@@ -205,7 +210,8 @@ func (api *API) MiddlewareSiswa(next gin.HandlerFunc) gin.HandlerFunc {
 
 		if token == "" {
 			c.JSON(401, gin.H{
-				"status":  401,
+				"status":  false,
+				"code":    401,
 				"message": "Token Not Valid",
 			})
 			return
@@ -219,38 +225,42 @@ func (api *API) MiddlewareSiswa(next gin.HandlerFunc) gin.HandlerFunc {
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
 				c.Writer.WriteHeader(http.StatusUnauthorized)
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"status":  "false",
-					"code":    http.StatusUnauthorized,
-					"message": err.Error(),
+
+				c.JSON(http.StatusUnauthorized, Result{
+					Status:  false,
+					Code:    http.StatusUnauthorized,
+					Message: err.Error(),
 				})
 				return
 			}
 			c.Writer.WriteHeader(http.StatusBadRequest)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": err.Error(),
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
 			})
 			return
 		}
 
 		if !parseTkn.Valid {
 			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": "token invalid!",
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: "token invalid",
 			})
 			return
 		}
 
 		if claims.Role != "siswa" {
 			c.Writer.WriteHeader(http.StatusForbidden)
-			c.JSON(http.StatusForbidden, gin.H{
-				"status":  "false",
-				"code":    http.StatusForbidden,
-				"message": "forbidden access",
+
+			c.JSON(http.StatusForbidden, Result{
+				Status:  false,
+				Code:    http.StatusForbidden,
+				Message: "forbidden access",
 			})
 			return
 		}
@@ -274,7 +284,8 @@ func (api *API) MiddlewareGuru(next gin.HandlerFunc) gin.HandlerFunc {
 
 		if token == "" {
 			c.JSON(401, gin.H{
-				"status":  401,
+				"status":  false,
+				"code":    401,
 				"message": "Token Not Valid",
 			})
 			return
@@ -288,38 +299,42 @@ func (api *API) MiddlewareGuru(next gin.HandlerFunc) gin.HandlerFunc {
 		if err != nil {
 			if err == jwt.ErrSignatureInvalid {
 				c.Writer.WriteHeader(http.StatusUnauthorized)
-				c.JSON(http.StatusUnauthorized, gin.H{
-					"status":  "false",
-					"code":    http.StatusUnauthorized,
-					"message": err.Error(),
+
+				c.JSON(http.StatusUnauthorized, Result{
+					Status:  false,
+					Code:    http.StatusUnauthorized,
+					Message: err.Error(),
 				})
 				return
 			}
 			c.Writer.WriteHeader(http.StatusBadRequest)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": err.Error(),
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
 			})
 			return
 		}
 
 		if !parseTkn.Valid {
 			c.Writer.WriteHeader(http.StatusUnauthorized)
-			c.JSON(http.StatusUnauthorized, gin.H{
-				"status":  "false",
-				"code":    http.StatusUnauthorized,
-				"message": "token invalid!",
+
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: "token invalid!",
 			})
 			return
 		}
 
-		if claims.Role != "siswa" {
+		if claims.Role != "guru" {
 			c.Writer.WriteHeader(http.StatusForbidden)
-			c.JSON(http.StatusForbidden, gin.H{
-				"status":  "false",
-				"code":    http.StatusForbidden,
-				"message": "forbidden access",
+
+			c.JSON(http.StatusForbidden, Result{
+				Status:  false,
+				Code:    http.StatusForbidden,
+				Message: "forbidden access",
 			})
 			return
 		}
