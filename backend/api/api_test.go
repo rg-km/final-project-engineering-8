@@ -21,6 +21,7 @@ var _ = Describe("Api", func() {
 		if err != nil {
 			panic(err)
 		}
+		defer db.Close()
 
 		userRepo := repo.NewUserRepository(db)
 		mainApi = api.NewAPI(*userRepo)
@@ -29,7 +30,7 @@ var _ = Describe("Api", func() {
 	Describe("/login", func() {
 		When("login with valid credentials", func() {
 			It("should return 200", func() {
-				user := `{"username":"ucup","password":"ucup123"}`
+				user := `{"username":"ruli","password":"ruli123"}`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
@@ -42,7 +43,7 @@ var _ = Describe("Api", func() {
 		})
 		When("login with invalid credentials", func() {
 			It("should return 401 because username is empty", func() {
-				user := `{"username":"","password":"ucup123"}`
+				user := `{"username":"","password":"ruli123"}`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
@@ -53,7 +54,7 @@ var _ = Describe("Api", func() {
 				Expect(resp.Code).To(Equal(http.StatusUnauthorized))
 			})
 			It("should return 401 because password is empty", func() {
-				user := `{"username":"ucup","password":""}`
+				user := `{"username":"ruli","password":""}`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
@@ -75,7 +76,7 @@ var _ = Describe("Api", func() {
 				Expect(resp.Code).To(Equal(http.StatusUnauthorized))
 			})
 			It("should return 401 because password is different with data in database", func() {
-				user := `{"username":"ucup","password":"ucup"}`
+				user := `{"username":"ruli","password":"ruli"}`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
@@ -86,7 +87,7 @@ var _ = Describe("Api", func() {
 				Expect(resp.Code).To(Equal(http.StatusUnauthorized))
 			})
 			It("should return 401 because username is different with data in database", func() {
-				user := `{"username":"ucup123","password":"ucup123"}`
+				user := `{"username":"ruli123","password":"ruli123"}`
 				resp := httptest.NewRecorder()
 				req, err := http.NewRequest(http.MethodPost, "/login", bytes.NewBufferString(user))
 				if err != nil {
