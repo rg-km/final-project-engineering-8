@@ -112,6 +112,9 @@ func (api *API) LoginUser(c *gin.Context) {
 	c.JSON(http.StatusOK, gin.H{
 		"status":  true,
 		"code":    http.StatusOK,
+		"id":      dataUser.UserID,
+		"name":    dataUser.Nama,
+		"role":    dataUser.Role,
 		"message": "login success",
 		"token":   tokenString,
 	})
