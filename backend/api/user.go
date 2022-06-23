@@ -625,7 +625,7 @@ func StoreBase64ToBucketImage(base64String string) (generatedLink string, err er
 	client := &http.Client{}
 
 	var jsonPayload = []byte(fmt.Sprintf("{\"image\": \"%s\"}", base64String))
-	r, fail := http.NewRequest("POST", "https://halloguru.herokuapp.com/v1/image", bytes.NewBuffer(jsonPayload))
+	r, fail := http.NewRequest("POST", "https://bucket-halloguru.online/v1/image", bytes.NewBuffer(jsonPayload))
 	r.Header.Set("Content-Type", "application/json")
 
 	resp, _ := client.Do(r)
