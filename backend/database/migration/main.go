@@ -4,11 +4,10 @@ import (
 	"database/sql"
 
 	_ "github.com/mattn/go-sqlite3"
-	con "github.com/rg-km/final-project-engineering-8/backend/database/connection"
 )
 
 func main() {
-	db, err := con.ConnectSQLite()
+	db, err := sql.Open("sqlite3", "../final_project.db")
 	if err != nil {
 		panic(err)
 	}
@@ -29,7 +28,8 @@ func CreateTableTest(db *sql.DB) (string, error) {
 		nama varchar(255) not null,
 		alamat varchar(255) not null,
 		noHp varchar(255) not null,
-		role varchar(255) not null
+		role varchar(255) not null,
+		profilePict TEXT NOT NULL DEFAULT "https://halloguru.herokuapp.com/bucket-image/halloguru/1655885462662157252.png")
 	);
 
 	CREATE TABLE IF NOT EXISTS jenjang (
@@ -62,9 +62,9 @@ func CreateTableTest(db *sql.DB) (string, error) {
 		FOREIGN KEY (KategoriID) REFERENCES kategori(KategoriID)
 	);
 
-	INSERT INTO jenjang (jenjang) VALUES ("SD"), ("SMP"), ("SMA");
-	INSERT INTO pelajaran (pelajaran) VALUES ("Matematika"),("Bahasa Inggris");
-	INSERT INTO kategori (kategori) VALUES ("Anak Berkebutuhan Khusus"), ("Anak Non Berkebutuhan Khusus");
+	INSERT INTO jenjang (jenjang) VALUES ("SD"), ("SMP"), ("SMA"), ("Semua Kategori");
+	INSERT INTO pelajaran (pelajaran) VALUES ("Matematika"),("Bahasa Inggris"),("Kimia"),("Biologi"),("Fisika"),("Semua Mata Pelajaran");
+	INSERT INTO kategori (kategori) VALUES ("Anak Berkebutuhan Khusus"), ("Anak Non Berkebutuhan Khusus"),("Semua Kategori");
 
 	INSERT INTO user (username, password, nama, alamat, noHP,role) 
 	VALUES 

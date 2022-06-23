@@ -1,13 +1,20 @@
 package api
 
 import (
+	"bytes"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"math"
 	"net/http"
+	"regexp"
+	"strconv"
+	"strings"
 	"time"
 
 	"github.com/gin-gonic/gin"
 	"github.com/golang-jwt/jwt/v4"
+	"golang.org/x/crypto/bcrypt"
 )
 
 func (api *API) LoginUser(c *gin.Context) {
@@ -16,62 +23,71 @@ func (api *API) LoginUser(c *gin.Context) {
 	err := json.NewDecoder(c.Request.Body).Decode(&cred)
 
 	if err != nil {
-		c.JSON(http.StatusBadRequest, gin.H{
-			"code":    http.StatusBadRequest,
-			"message": "Invalid request body",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "Invalid request body",
 		})
 		return
 	}
 
 	if cred.Username == "" && cred.Password == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "username dan password tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "username dan password tidak boleh kosong",
 		})
 		return
 	} else if cred.Username == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "username tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "username tidak boleh kosong",
 		})
 		return
 	} else if cred.Password == "" {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "password tidak boleh kosong",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "password tidak boleh kosong",
 		})
 		return
 	}
 
-	resp, err := api.userRepo.LoginUser(cred.Username, cred.Password)
+	resp, err := api.userRepo.LoginUser(cred.Username)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
 	dataUser := *resp
 
-	if dataUser.Password != cred.Password {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "user credential invalid",
+	if err := bcrypt.CompareHashAndPassword([]byte(dataUser.Password), []byte(cred.Password)); err != nil {
+
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "password salah",
 		})
 		return
 	} else if dataUser.Username != cred.Username {
-		c.JSON(http.StatusUnauthorized, gin.H{
-			"code":    http.StatusUnauthorized,
-			"message": "user credential invalid",
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "user credential invalid",
 		})
 		return
 	}
 
-	expirationTime := time.Now().Local().Add((5 * time.Minute))
+	expirationTime := time.Now().Local().Add((7 * time.Hour) + (30 * time.Minute))
 
 	claims := &Claims{
+		ID:       int64(dataUser.UserID),
 		Username: cred.Username,
-		Role:     "user",
+		Role:     dataUser.Role,
 		StandardClaims: jwt.StandardClaims{
 			ExpiresAt: expirationTime.Unix(),
 		},
@@ -81,9 +97,10 @@ func (api *API) LoginUser(c *gin.Context) {
 
 	tokenString, err := token.SignedString(jwtKey)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    http.StatusInternalServerError,
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: "password tidak boleh kosong",
 		})
 		return
 	}
@@ -94,14 +111,20 @@ func (api *API) LoginUser(c *gin.Context) {
 		Expires: expirationTime,
 	})
 
+	c.Header("Authorization", "Bearer "+tokenString)
 	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "login success",
-		"data":    dataUser,
+		"status":       true,
+		"code":         http.StatusOK,
+		"id":           dataUser.UserID,
+		"name":         dataUser.Nama,
+		"role":         dataUser.Role,
+		"profile_pict": dataUser.ProfilePict,
+		"message":      "login success",
+		"token":        tokenString,
 	})
 }
 
-func (api *API) Register(c *gin.Context) {
+func (api *API) StudentRegister(c *gin.Context) {
 	api.AllowOrigin(c)
 	var register Register
 	if err := c.ShouldBindJSON(&register); err != nil {
@@ -111,43 +134,87 @@ func (api *API) Register(c *gin.Context) {
 		return
 	}
 	// register.Username = c.PostForm("username")
-	data, err := api.userRepo.Register(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Role)
+	password, _ := bcrypt.GenerateFromPassword([]byte(register.Password), 10)
+	strPassword := string(password)
+
+	data, err := api.userRepo.StudentRegister(register.Username, strPassword, register.Nama, register.Alamat, register.NoHp)
 	if err != nil {
-		c.JSON(http.StatusInternalServerError, gin.H{
-			"code":    "500",
-			"message": err.Error(),
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
 		})
 		return
 	}
 
-	c.JSON(http.StatusOK, gin.H{
-		"code": "200",
-		"data": data,
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "registration success",
+		Data:    data,
 	})
+}
+
+func (api *API) TeacherRegister(c *gin.Context) {
+	api.AllowOrigin(c)
+	var register Register
+	if err := c.ShouldBindJSON(&register); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	// register.Username = c.PostForm("username")
+	password, err := HashPassword(register.Password)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	register.Password = password
+
+	data, err := api.userRepo.TeacherRegister(register.Username, register.Password, register.Nama, register.Alamat, register.NoHp, register.Deskripsi, register.Biaya, register.JenjangID, register.PelajaranID, register.KategoriID)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "registration success",
+		Data:    data,
+	})
+}
+
+func HashPassword(password string) (string, error) {
+	bytes, err := bcrypt.GenerateFromPassword([]byte(password), 14)
+	return string(bytes), err
+}
+
+func CheckPasswordHash(password, hash string) bool {
+	err := bcrypt.CompareHashAndPassword([]byte(hash), []byte(password))
+	return err == nil
 }
 
 func (api *API) Logout(c *gin.Context) {
 	//logout
-	// _, err := c.Request.Cookie("token")
-	// fmt.Println(err)
-	// if err != nil {
-	// 	c.JSON(http.StatusUnauthorized, gin.H{
-	// 		"code":    http.StatusUnauthorized,
-	// 		"message": "anda belum login",
-	// 	})
-	// 	return
-	// }
 	api.AllowOrigin(c)
 
-	http.SetCookie(c.Writer, &http.Cookie{
-		Name:    "token",
-		Value:   "",
-		Expires: time.Unix(0, 0),
-	})
+	c.Header("Authorization", "")
 
-	c.JSON(http.StatusOK, gin.H{
-		"code":    http.StatusOK,
-		"message": "logout success",
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "logout success",
 	})
 }
 
@@ -216,6 +283,11 @@ func (api *API) GetTeachers(c *gin.Context) {
 		return
 	}
 
+	totalPage := 1
+	if total > perPage {
+		totalPage = int(math.Ceil(float64(total) / float64(perPage)))
+	}
+
 	c.JSON(http.StatusOK, Result{
 		Status:  true,
 		Code:    http.StatusOK,
@@ -225,7 +297,356 @@ func (api *API) GetTeachers(c *gin.Context) {
 			Total:     total,
 			Page:      page,
 			PerPage:   perPage,
-			TotalPage: 10,
+			TotalPage: totalPage,
 		},
 	})
+}
+
+func (api *API) UpdateTeacherById(c *gin.Context) {
+	api.AllowOrigin(c)
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(http.StatusInternalServerError, Result{
+				Status:  false,
+				Code:    http.StatusInternalServerError,
+				Message: "Failed to update teacher, ERROR: " + message,
+				Data:    nil,
+			})
+			return
+		}
+	}()
+
+	payload, err := c.GetRawData()
+	if err != nil {
+		c.JSON(http.StatusBadRequest, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: "Bad Request: " + message,
+			Data:    nil,
+		})
+
+		return
+	}
+
+	teacherData := make(map[string]interface{})
+	json.Unmarshal(payload, &teacherData)
+
+	if teacherData["profile_pict"] != nil {
+
+		isLinkFormat := CheckIsLinkFormat(teacherData["profile_pict"].(string))
+
+		if !isLinkFormat {
+			// Jika bukan link, berarti base64 string
+			// Maka store base64 ke image bucket untuk generate link
+			generatedLink, err := StoreBase64ToBucketImage(teacherData["profile_pict"].(string))
+			fmt.Println("Generated Link ==>", generatedLink)
+
+			if err != nil {
+				isError = true
+				message = err.Error()
+				return
+			}
+
+			// pass generated link to payload
+			teacherData["profile_pict"] = generatedLink
+		}
+
+	}
+
+	err = api.userRepo.UpdateTeacher(id, teacherData)
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	updatedTeacher, err := api.userRepo.GetTeacherByID(id)
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    updatedTeacher,
+	})
+}
+
+func (api *API) DeleteTeacher(c *gin.Context) {
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+		code    int
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(code, Result{
+				Status:  false,
+				Code:    code,
+				Message: message,
+				Data:    nil,
+			})
+		}
+	}()
+
+	code, err := api.userRepo.DeleteTeacherByUserID(id)
+
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    nil,
+	})
+}
+
+func (api *API) GetTeacherByUserID(c *gin.Context) {
+	id := c.Param("id")
+
+	var (
+		isError bool
+		message string
+	)
+
+	defer func() {
+		if isError {
+			c.JSON(http.StatusInternalServerError, Result{
+				Status:  false,
+				Code:    http.StatusInternalServerError,
+				Message: message,
+				Data:    nil,
+			})
+		}
+	}()
+
+	teacher, err := api.userRepo.GetTeacherByID(id)
+
+	if err != nil {
+		isError = true
+		message = err.Error()
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    teacher,
+	})
+}
+
+func (api *API) GetStudentLogin(c *gin.Context) {
+	var token string
+	authHeader := c.Request.Header.Get("Authorization")
+	bearerToken := strings.Split(authHeader, " ")
+	if len(bearerToken) == 2 {
+		token = bearerToken[1]
+	} else {
+		token = ""
+	}
+
+	if token == "" {
+		c.JSON(401, gin.H{
+			"status":  false,
+			"code":    401,
+			"message": "Token Not Valid",
+		})
+		return
+	}
+	claims := &Claims{}
+
+	parseTkn, err := jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	if err != nil {
+		if err == jwt.ErrSignatureInvalid {
+			c.Writer.WriteHeader(http.StatusUnauthorized)
+			c.JSON(http.StatusUnauthorized, Result{
+				Status:  false,
+				Code:    http.StatusUnauthorized,
+				Message: err.Error(),
+			})
+			return
+		}
+		c.Writer.WriteHeader(http.StatusBadRequest)
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	if !parseTkn.Valid {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: "token invalid!",
+		})
+		return
+	}
+
+	username := claims.Username
+	student, err := api.userRepo.GetStudentProfile(username)
+	if err != nil {
+		c.Writer.WriteHeader(http.StatusUnauthorized)
+		c.JSON(http.StatusUnauthorized, Result{
+			Status:  false,
+			Code:    http.StatusUnauthorized,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+		Data:    student,
+	})
+}
+
+func (api *API) UpdateStudentById(c *gin.Context) {
+	api.AllowOrigin(c)
+	var user Users
+	id := c.Param("id")
+
+	convertIDInt, _ := strconv.Atoi(id)
+
+	if err := c.ShouldBindJSON(&user); err != nil {
+		c.JSON(400, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+
+	if user.ProfilePict != "" {
+
+		isLinkFormat := CheckIsLinkFormat(user.ProfilePict)
+
+		if !isLinkFormat {
+			// Jika bukan link, berarti base64 string
+			// Maka store base64 ke image bucket untuk generate link
+			generatedLink, err := StoreBase64ToBucketImage(user.ProfilePict)
+			fmt.Println("Generated Link ==>", generatedLink)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, Result{
+					Status:  false,
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+				return
+			}
+
+			// pass generated link to payload
+			user.ProfilePict = generatedLink
+		}
+
+	}
+
+	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
+	strPassword := string(password)
+	data, err := api.userRepo.UpdateStudentById(convertIDInt, user.Username, strPassword, user.Nama, user.Alamat, user.NoHp, user.ProfilePict)
+
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "update successfully",
+		Data:    data,
+	})
+}
+
+func (api *API) DeleteStudent(c *gin.Context) {
+	var token string
+	authHeader := c.Request.Header.Get("Authorization")
+	bearerToken := strings.Split(authHeader, " ")
+	token = bearerToken[1]
+
+	claims := &Claims{}
+
+	jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	userID := claims.ID
+	if code, err := api.userRepo.DeleteUserByID(int(userID)); err != nil {
+		c.JSON(code, Result{
+			Status:  false,
+			Code:    code,
+			Message: err.Error(),
+		})
+		return
+	}
+	fmt.Println("token ==> ", claims)
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+	})
+}
+
+func CheckIsLinkFormat(text string) bool {
+	regex, _ := regexp.Compile(`http(s*)://`)
+	return regex.MatchString(text)
+}
+
+func StoreBase64ToBucketImage(base64String string) (generatedLink string, err error) {
+	client := &http.Client{}
+
+	var jsonPayload = []byte(fmt.Sprintf("{\"image\": \"%s\"}", base64String))
+	r, fail := http.NewRequest("POST", "https://halloguru.herokuapp.com/v1/image", bytes.NewBuffer(jsonPayload))
+	r.Header.Set("Content-Type", "application/json")
+
+	resp, _ := client.Do(r)
+	if fail != nil {
+		return generatedLink, fail
+	}
+
+	defer resp.Body.Close()
+
+	var body map[string]interface{}
+	fail = json.NewDecoder(resp.Body).Decode(&body)
+
+	if fail != nil {
+		return generatedLink, fail
+	}
+
+	if resp.StatusCode != 200 {
+		return generatedLink, errors.New(fmt.Sprint("Failed store image to bucket, ERROR: ", body["message"]))
+	}
+
+	fmt.Println("Response ==>", body)
+
+	return body["link"].(string), nil
 }
