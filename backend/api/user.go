@@ -540,9 +540,35 @@ func (api *API) UpdateStudentById(c *gin.Context) {
 		return
 	}
 
+	if user.ProfilePict != "" {
+
+		isLinkFormat := CheckIsLinkFormat(user.ProfilePict)
+
+		if !isLinkFormat {
+			// Jika bukan link, berarti base64 string
+			// Maka store base64 ke image bucket untuk generate link
+			generatedLink, err := StoreBase64ToBucketImage(user.ProfilePict)
+			fmt.Println("Generated Link ==>", generatedLink)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, Result{
+					Status:  false,
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+				return
+			}
+
+			// pass generated link to payload
+			user.ProfilePict = generatedLink
+		}
+
+	}
+
 	password, _ := bcrypt.GenerateFromPassword([]byte(user.Password), 10)
 	strPassword := string(password)
-	data, err := api.userRepo.UpdateStudentById(convertIDInt, user.Username, strPassword, user.Nama, user.Alamat, user.NoHp)
+	data, err := api.userRepo.UpdateStudentById(convertIDInt, user.Username, strPassword, user.Nama, user.Alamat, user.NoHp, user.ProfilePict)
+
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, Result{
 			Status:  false,

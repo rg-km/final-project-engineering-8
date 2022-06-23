@@ -34,11 +34,12 @@ type Claims struct {
 }
 
 type Users struct {
-	UserID   int    `json:"user_id"`
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Nama     string `json:"nama"`
-	Alamat   string `json:"alamat"`
-	NoHp     string `json:"no_hp"`
-	Role     string `json:"role"`
+	UserID      int    `json:"user_id"`
+	Username    string `json:"username"`
+	Password    string `json:"password"`
+	Nama        string `json:"nama"`
+	Alamat      string `json:"alamat"`
+	NoHp        string `json:"no_hp"`
+	ProfilePict string `json:"profile_pict"`
+	Role        string `json:"role"`
 }
