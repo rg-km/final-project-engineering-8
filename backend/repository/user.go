@@ -7,7 +7,7 @@ import (
 	// repo "github.com/rg-km/final-project-engineering-8/backend/repository"
 )
 
-var DefaultProfilePict = "https://halloguru.herokuapp.com/bucket-image/halloguru/1655885462662157252.png"
+var DefaultProfilePict = "https://bucket-halloguru.online/bucket-image/halloguru/default.png"
 
 type UserRepository struct {
 	db *sql.DB
