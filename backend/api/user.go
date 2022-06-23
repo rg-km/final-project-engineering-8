@@ -560,6 +560,36 @@ func (api *API) UpdateStudentById(c *gin.Context) {
 	})
 }
 
+func (api *API) DeleteStudent(c *gin.Context) {
+	var token string
+	authHeader := c.Request.Header.Get("Authorization")
+	bearerToken := strings.Split(authHeader, " ")
+	token = bearerToken[1]
+
+	claims := &Claims{}
+
+	jwt.ParseWithClaims(token, claims, func(token *jwt.Token) (interface{}, error) {
+		return jwtKey, nil
+	})
+
+	userID := claims.ID
+	if code, err := api.userRepo.DeleteUserByID(int(userID)); err != nil {
+		c.JSON(code, Result{
+			Status:  false,
+			Code:    code,
+			Message: err.Error(),
+		})
+		return
+	}
+	fmt.Println("token ==> ", claims)
+
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "Success",
+	})
+}
+
 func CheckIsLinkFormat(text string) bool {
 	regex, _ := regexp.Compile(`http(s*)://`)
 	return regex.MatchString(text)
