@@ -13,9 +13,21 @@ RUN set -ex && \
 
 WORKDIR /app
 
-COPY . .
+COPY go.mod go.sum ./
 
-RUN go get
+RUN go mod download
+
+RUN go mod tidy
+
+COPY . ./
+
+RUN ls
+
+EXPOSE 5000
+
+ENV PORT=5000
+
+RUN echo "===> Port:" $PORT
 
 RUN go build -o halloguru-api
 
