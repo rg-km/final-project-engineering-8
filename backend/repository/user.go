@@ -366,7 +366,7 @@ func (u *UserRepository) GetStudentProfile(username string) (*User, error) {
 	return &user, nil
 }
 
-func (u *UserRepository) UpdateStudentById(userId int, username string, password string, nama string, alamat string, noHp string) (*User, error) {
+func (u *UserRepository) UpdateStudentById(userId int, username string, password string, nama string, alamat string, noHp string, profil_pict string) (*User, error) {
 	check, _ := u.CheckAccountUpdate(username, userId)
 
 	//check jika data sudah ada
@@ -375,9 +375,9 @@ func (u *UserRepository) UpdateStudentById(userId int, username string, password
 		return nil, err1
 	} else {
 
-		sqlStatement := `UPDATE user SET username = ?, password = ?, nama = ?, alamat = ?, noHp = ? WHERE userId = ?;`
+		sqlStatement := `UPDATE user SET username = ?, password = ?, nama = ?, alamat = ?, noHp = ?, profilePict = ? WHERE userId = ?;`
 
-		_, err := u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, userId)
+		_, err := u.db.Exec(sqlStatement, username, password, nama, alamat, noHp, profil_pict, userId)
 		if err != nil {
 			return nil, err
 		}
