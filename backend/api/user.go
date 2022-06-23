@@ -82,7 +82,7 @@ func (api *API) LoginUser(c *gin.Context) {
 		return
 	}
 
-	expirationTime := time.Now().Local().Add((5 * time.Minute))
+	expirationTime := time.Now().Local().Add((7 * time.Hour) + (30 * time.Minute))
 
 	claims := &Claims{
 		ID:       int64(dataUser.UserID),
