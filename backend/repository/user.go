@@ -394,3 +394,12 @@ func (u *UserRepository) DeleteUserByID(id int) (code int, err error) {
 	}
 	return 200, nil
 }
+
+func (u *UserRepository) UpdateUserByID(id string, nama string, alamat string, noHp string, profilePict string) (code int, err error) {
+	sqlStatement := `UPDATE user SET nama = ?, alamat = ?, noHp = ?, profilePict = ? WHERE UserID = ?`
+	_, err = u.db.Exec(sqlStatement, nama, alamat, noHp, profilePict, id)
+	if err != nil {
+		return 500, err
+	}
+	return 200, nil
+}
