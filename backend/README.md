@@ -64,3 +64,12 @@ MENJALANKAN LOGOUT
 4. Pastikan sudah login terlebih dahulu, jika belum login maka ada pesan kesalahan
 
 5. Jika berhasil akan ada pesan success
+
+
+## Postman setup
+1. Import collection `halloguru.postman_collection.json` di postman
+2. Setelah import maka akan mendapatkan semua API request yang tersedia
+3. Untuk hit request di postman, pastikan untuk memilih terlebih dahulu Environtment di pojok kanan atas
+   - Environment `DEV-TEST` => untuk hit request ke service yang berada di cloud(internet)
+   - Environment `DEV-LOCAL` => untuk hit request ke service yang berada di localhost (running go project)
+4. Setelah itu pilih request yg diinginkan lalu klik `SEND`
