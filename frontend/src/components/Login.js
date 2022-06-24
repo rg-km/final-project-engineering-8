@@ -1,8 +1,11 @@
 import React from "react";
 import 'bootstrap/dist/css/bootstrap.min.css'
 import '../style/LoginRegister.css'
+import { Button } from 'react-bootstrap';
 import image from '../images/login.svg'
 import { useNavigate } from 'react-router-dom'
+import useStore from "../store/User"
+import Modal from "./Modal";
 
 function Login() {
 
@@ -10,7 +13,12 @@ function Login() {
     const [password, setPassword] = React.useState('');
     const [userErr, setUserErr] = React.useState(false);
     const [passErr, setPassErr] = React.useState(false);
+    const [modalShow, setModalShow] = React.useState(false);
+    const [modalMessage, setModalMessage] = React.useState("Username/Pasword Salah");
     const navigate = useNavigate();
+
+    //zustand
+    const { id, name, setId, setName, setToken } = useStore()
 
     const handleLogin = async () => {
         //validation
@@ -42,11 +50,16 @@ function Login() {
             result = await result.json();
             console.warn(result);
 
-            if (result.data) {
-                localStorage.setItem("user-info", JSON.stringify(result.data));
+            if (result.status === true) {
+                localStorage.setItem("user-info", JSON.stringify(result));
+                //set Zustand
+                setId(result.id);
+                setName(result.name);
+                setToken(result.token);
                 navigate('/')
             } else {
-                alert("Username atau Password Salah");
+                //alert("Username atau Password Salah");
+                setModalShow(true)
             }
         }
     }
@@ -97,6 +110,11 @@ function Login() {
                 </div>
             </div>
 
+            <Modal
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                message={modalMessage}
+            />
         </div>
     );
 }

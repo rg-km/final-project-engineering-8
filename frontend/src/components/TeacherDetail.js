@@ -8,17 +8,18 @@ const TeacherDetail = () => {
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
     const [urlWA, setURLWA] = useState();
-    const controller = new AbortController();
+    const auth = JSON.parse(localStorage.getItem("user-info"));
 
     const loadDetail = async () => {
         setLoading(true);
         try {
             const url = "https://api-dev-halloguru.herokuapp.com/v1/teacher/" + id;
-            const { data } = await axios.get(url);
+            const { data } = await axios.get(url, { headers: { "Authorization": `Bearer ${auth.token}` } });
 
             setDetail(data.data);
             console.log("detail teacher : ", data);
-            setURLWA("https://wa.me/" + detail.no_hp);
+            setURLWA("https://wa.me/" + data.no_hp);
+            console.log("wa " + urlWA)
         } catch (error) {
             console.log(error);
         }
@@ -73,7 +74,7 @@ const TeacherDetail = () => {
                             </tr>
                         </tbody>
                     </table>
-                    <button className="btn btn-primary mt-3"> <a href={urlWA} target="_blank">Hubungi</a>
+                    <button className="btn btn-primary mt-3"> <a href={urlWA}>Hubungi</a>
 
                     </button>
                 </div>

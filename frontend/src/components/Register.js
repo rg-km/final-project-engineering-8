@@ -4,6 +4,7 @@ import '../style/LoginRegister.css'
 import '../App.css'
 import image from '../images/register.svg'
 import { useNavigate } from 'react-router-dom'
+import Modal from "./Modal";
 
 export default function Register() {
 
@@ -13,6 +14,8 @@ export default function Register() {
     const [alamat, setAlamat] = useState("");
     const [no_hp, setNo_hp] = useState("");
     const [role, setRole] = useState("siswa");
+    const [modalShow, setModalShow] = React.useState(false);
+    const [modalMessage, setModalMessage] = React.useState("Register Berhasil, Silahkan Login terlebih dahulu untuk melanjutkan.");
 
     const [namaErr, setNamaErr] = useState(false);
     const [userErr, setUserErr] = useState(false);
@@ -20,6 +23,7 @@ export default function Register() {
     const [noHPErr, setNoHPErr] = useState(false);
     const [passErr, setPassErr] = useState(false);
     const navigate = useNavigate();
+
 
     async function collectData() {
         //validation
@@ -65,7 +69,7 @@ export default function Register() {
             let item = { username, password, nama, alamat, no_hp, role };
             console.warn(item)
 
-            let result = await fetch('https://api-dev-halloguru.herokuapp.com/register', {
+            let result = await fetch('https://api-dev-halloguru.herokuapp.com/register/student', {
                 method: 'POST',
                 body: JSON.stringify(item),
                 headers: {
@@ -74,12 +78,18 @@ export default function Register() {
                 }
             });
             result = await result.json();
-            //console.warn("result", result);
-            //localStorage.setItem("user-info", JSON.stringify(result));
-            if (result.data) {
 
+            if (result.data) {
+                setModalShow(true)
                 navigate('/login');
+                setModalShow(true);
+                setUsername("");
+                setNama("");
+                setAlamat("")
+                setPassword("")
+                setNo_hp("")
             }
+
         }
 
     }
@@ -168,6 +178,12 @@ export default function Register() {
                     </form>
                 </div>
             </div>
+
+            <Modal
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                message={modalMessage}
+            />
         </div>
     )
 

@@ -7,8 +7,9 @@ import Register from './components/Register'
 import RegisterTeacher from './components/RegisterTeacher'
 import Home from './components/Home';
 import TeacherDetail from './components/TeacherDetail';
+import StudentProfile from './components/StudentProfile'
+import PrivateComponent from './components/PrivateComponent'
 import NotFound from './components/NotFound';
-
 
 function App() {
   return (
@@ -21,7 +22,10 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="register/teacher" element={<RegisterTeacher />} />
-        <Route path="teacher/:id" element={<TeacherDetail />} />
+        <Route element={<PrivateComponent />}>
+          <Route path="teacher/:id" element={<TeacherDetail />} />
+          <Route path="profile" element={<StudentProfile />} />
+        </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>
 

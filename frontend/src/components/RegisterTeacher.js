@@ -12,7 +12,6 @@ export default function Register() {
     const [nama, setNama] = useState("")
     const [alamat, setAlamat] = useState("");
     const [no_hp, setNo_hp] = useState("");
-    const [role, setRole] = useState("siswa");
 
     const [namaErr, setNamaErr] = useState(false);
     const [userErr, setUserErr] = useState(false);
@@ -62,10 +61,10 @@ export default function Register() {
 
         console.log("aman ", aman)
         if (aman) {
-            let item = { username, password, nama, alamat, no_hp, role };
+            let item = { username, password, nama, alamat, no_hp };
             console.warn(item)
 
-            let result = await fetch('https://api-dev-halloguru.herokuapp.com/register', {
+            let result = await fetch('https://api-dev-halloguru.herokuapp.com/register/teacher', {
                 method: 'POST',
                 body: JSON.stringify(item),
                 headers: {
@@ -94,29 +93,31 @@ export default function Register() {
                 </div>
                 <div className="register-left">
                     <form>
-                        <h3>Register</h3>
-                        <div className="mb-3">
-                            <label>Nama</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Masukkan Nama"
-                                value={nama}
-                                onChange={(e) => setNama(e.target.value)}
-                            />
-                            {namaErr ? <span className="warning">Nama tidak boleh kosong</span> : ""}
+                        <h3>Register Teacher</h3>
+                        <div className='d-flex'>
+                            <div className="mb-3 jarakKanan">
+                                <label>Nama</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Masukkan Nama"
+                                    value={nama}
+                                    onChange={(e) => setNama(e.target.value)}
+                                />
+                                {namaErr ? <span className="warning">Nama tidak boleh kosong</span> : ""}
 
-                        </div>
-                        <div className="mb-3">
-                            <label>Username</label>
-                            <input
-                                type="text"
-                                className="form-control"
-                                placeholder="Username minimal 4 karakter"
-                                value={username}
-                                onChange={(e) => setUsername(e.target.value)}
-                            />
-                            {userErr ? <span className="warning">Username minimal 4 karakter</span> : ""}
+                            </div>
+                            <div className="mb-3">
+                                <label>Username</label>
+                                <input
+                                    type="text"
+                                    className="form-control"
+                                    placeholder="Minimal 4 karakter"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                                {userErr ? <span className="warning">Minimal 4 karakter</span> : ""}
+                            </div>
                         </div>
                         <div className="mb-3">
                             <label>Alamat</label>
@@ -142,6 +143,36 @@ export default function Register() {
                             {noHPErr ? <span className="warning">No HP tidak boleh kosong</span> : ""}
 
                         </div>
+                        <div className="d-flex">
+                            <div className="mb-3 jarakKanan">
+                                <label for="exampleFormControlSelect1">Jenjang Didik</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>SD</option>
+                                    <option>SMP</option>
+                                    <option>SMA</option>
+                                    <option>Semua Jenjang</option>
+                                </select>
+                            </div>
+                            <div className="mb-3">
+                                <label for="exampleFormControlSelect1">Mata Pelajaran Didik</label>
+                                <select class="form-control" id="exampleFormControlSelect1">
+                                    <option>Matematika</option>
+                                    <option>Bahasa Inggris</option>
+                                    <option>Kimia</option>
+                                    <option>Biologi</option>
+                                    <option>Fisika</option>
+                                    <option>Semua Mata Pelajaran</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div className="mb-3">
+                            <label for="exampleFormControlSelect1">Kategori Didik</label>
+                            <select class="form-control" id="exampleFormControlSelect1">
+                                <option>ABK</option>
+                                <option>NON ABK</option>
+                                <option>Semua Kategori</option>
+                            </select>
+                        </div>
                         <div className="mb-3">
                             <label>Password</label>
                             <input
@@ -153,22 +184,17 @@ export default function Register() {
                             />
                             {passErr ? <span className="warning">Password minimal 8 karakter</span> : ""}
                         </div>
-                        <input
-                            type="hidden"
-                            value={role}
-                        />
+
                         <div className="d-grid">
                             <button type="button" onClick={collectData} className="btn btn-primary">
                                 Sign Up
                             </button>
                         </div>
-                        <p className="forgot-password text-right">
-                            Sudah memiliki akun? <a href="/login">Login</a>
-                        </p>
+
                     </form>
                 </div>
-            </div>
-        </div>
+            </div >
+        </div >
     )
 
 }
