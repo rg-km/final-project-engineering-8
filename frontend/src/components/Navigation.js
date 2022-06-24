@@ -1,16 +1,16 @@
-import React, { useEffect } from "react";
+import React, { useState } from "react";
 import Container from 'react-bootstrap/Container';
 import Nav from 'react-bootstrap/Nav';
 import Navbar from 'react-bootstrap/Navbar';
 import { useNavigate } from 'react-router-dom'
 
-
 function Navigation() {
-    const auth = localStorage.getItem("user-info");
+    const auth = JSON.parse(localStorage.getItem("user-info"));
     const navigate = useNavigate();
+
     const logout = () => {
         localStorage.removeItem("user-info");
-        navigate('/');
+        navigate('/home');
     }
 
     return (
@@ -31,17 +31,11 @@ function Navigation() {
                                 <Nav.Link className="nav-link" href="/register">Register</Nav.Link>
                             </div>
                             :
-                            <Nav.Link onClick={logout} href="/login">Logout</Nav.Link>
+                            <div className="d-flex">
+                                <Nav.Link href="/profile"><img src={auth.profile_pict} alt="profile pict" className="profile-pict" /> {auth.name}</Nav.Link>
+                                <Nav.Link onClick={logout}>Logout</Nav.Link>
+                            </div>
                         }
-
-                        {/* <Nav.Link className="nav-link" href={'/login'}>
-                            Login
-                        </Nav.Link>
-                        <Link className="nav-link" to={'/register'}>
-                            Register
-                        </Link> */}
-
-
                     </Nav>
                 </Navbar.Collapse>
             </Container>
