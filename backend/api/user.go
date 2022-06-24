@@ -650,3 +650,56 @@ func StoreBase64ToBucketImage(base64String string) (generatedLink string, err er
 
 	return body["link"].(string), nil
 }
+
+func (api *API) UpdateUserbyID(c *gin.Context) {
+	api.AllowOrigin(c)
+	id := c.Param("id")
+
+	var user Users
+	err := c.ShouldBindJSON(&user)
+	if err != nil {
+		c.JSON(500, gin.H{
+			"error": err.Error(),
+		})
+		return
+	}
+	if user.ProfilePict != "" {
+
+		isLinkFormat := CheckIsLinkFormat(user.ProfilePict)
+
+		if !isLinkFormat {
+			// Jika bukan link, berarti base64 string
+			// Maka store base64 ke image bucket untuk generate link
+			generatedLink, err := StoreBase64ToBucketImage(user.ProfilePict)
+			fmt.Println("Generated Link ==>", generatedLink)
+
+			if err != nil {
+				c.JSON(http.StatusInternalServerError, Result{
+					Status:  false,
+					Code:    http.StatusInternalServerError,
+					Message: err.Error(),
+				})
+				return
+			}
+
+			// pass generated link to payload
+			user.ProfilePict = generatedLink
+		}
+
+	}
+	code, err := api.userRepo.UpdateUserByID(id, user.Nama, user.Alamat, user.NoHp, user.ProfilePict)
+	if err != nil {
+		c.JSON(code, Result{
+			Status:  false,
+			Code:    code,
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "success",
+	})
+
+}
