@@ -9,6 +9,7 @@ import Home from './components/Home';
 import TeacherDetail from './components/TeacherDetail';
 import StudentProfile from './components/StudentProfile'
 import PrivateComponent from './components/PrivateComponent'
+import LoginTeacher from './components/LoginTeacher'
 import NotFound from './components/NotFound';
 
 function App() {
@@ -22,6 +23,7 @@ function App() {
         <Route path="login" element={<Login />} />
         <Route path="register" element={<Register />} />
         <Route path="register/teacher" element={<RegisterTeacher />} />
+        <Route path="login/teacher" element={<LoginTeacher />} />
         <Route element={<PrivateComponent />}>
           <Route path="teacher/:id" element={<TeacherDetail />} />
           <Route path="profile" element={<StudentProfile />} />
