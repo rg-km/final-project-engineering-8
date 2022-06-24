@@ -403,3 +403,14 @@ func (u *UserRepository) UpdateUserByID(id string, nama string, alamat string, n
 	}
 	return 200, nil
 }
+
+func (u *UserRepository) GetUserByID(id string) (*User, error) {
+	sqlStatement := `SELECT * FROM user WHERE UserID = ?`
+	var user User
+	err := u.db.QueryRow(sqlStatement, id).Scan(&user.UserID, &user.Username, &user.Password, &user.Nama, &user.Alamat, &user.NoHp, &user.Role, &user.ProfilePict)
+	if err != nil {
+		return nil, err
+	}
+	return &user, nil
+
+}

@@ -703,3 +703,25 @@ func (api *API) UpdateUserbyID(c *gin.Context) {
 	})
 
 }
+
+func (api *API) GetUserbyID(c *gin.Context) {
+	api.AllowOrigin(c)
+	id := c.Param("id")
+
+	user, err := api.userRepo.GetUserByID(id)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, Result{
+			Status:  false,
+			Code:    http.StatusInternalServerError,
+			Message: err.Error(),
+		})
+		return
+	}
+	c.JSON(http.StatusOK, Result{
+		Status:  true,
+		Code:    http.StatusOK,
+		Message: "success",
+		Data:    user,
+	})
+
+}
