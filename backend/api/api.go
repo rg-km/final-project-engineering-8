@@ -32,6 +32,7 @@ func NewAPI(userRepo repo.UserRepository) *API {
 	gin.PUT("/v1/student/update/:id", api.AuthMiddleWare(api.MiddlewareSiswa(api.UpdateStudentById)))
 	gin.DELETE("/v1/student", api.AuthMiddleWare(api.MiddlewareSiswa(api.DeleteStudent)))
 	gin.PUT("/v1/student/:id", api.AuthMiddleWare(api.MiddlewareSiswa(api.UpdateUserbyID)))
+	gin.GET("/v1/student/:id", api.AuthMiddleWare(api.MiddlewareSiswa(api.GetUserbyID)))
 
 	return api
 }
