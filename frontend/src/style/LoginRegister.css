@@ -1,6 +1,11 @@
+.wrapper-tr {
+    width: 650px;
+    margin: 0 auto;
+}
+
 .login-wrapper {
     width: 650px;
-    margin: auto;
+    margin: 0 auto;
     border-radius: 15px;
     transition: all .3s;
     background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%)

@@ -35,7 +35,7 @@ function Login() {
 
         if (aman) {
 
-            let result = await fetch(' https://api-dev-halloguru.herokuapp.com/login', {
+            let result = await fetch(' https://api-dev-halloguru.herokuapp.com/login/teacher', {
                 method: 'POST',
                 body: JSON.stringify({ username, password }),
                 headers: {
@@ -47,7 +47,7 @@ function Login() {
 
             if (result.status === true) {
                 localStorage.setItem("user-info", JSON.stringify(result));
-                navigate('/')
+                navigate('/teacher')
             } else {
                 setModalShow(true)
             }
@@ -55,16 +55,17 @@ function Login() {
     }
 
     return (
+
         <div className="container">
             <div className="auth-wrapper">
                 <div className="wrapper-tr">
-                    <p className="forgot-password text-right mt-5 mb-2">Login Sebagai Guru? <a href="/login/teacher">disini</a></p>
+                    <p className="forgot-password text-right mt-5 mb-2 ">Login Sebagai Murid? <a href="/login">disini</a></p>
                 </div>
                 <div className="login-wrapper d-flex">
 
                     <div className="login-left ">
                         <form>
-                            <h3>LOGIN sebagai Murid</h3>
+                            <h3>LOGIN Sebagai Guru</h3>
                             <div className="mb-3">
                                 <label>Username</label>
                                 <input

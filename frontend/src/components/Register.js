@@ -14,8 +14,8 @@ export default function Register() {
     const [alamat, setAlamat] = useState("");
     const [no_hp, setNo_hp] = useState("");
     const [role, setRole] = useState("siswa");
-    const [modalShow, setModalShow] = React.useState(false);
-    const [modalMessage, setModalMessage] = React.useState("Register Berhasil, Silahkan Login terlebih dahulu untuk melanjutkan.");
+    const [modalShow, setModalShow] = useState(false);
+    const [modalMessage, setModalMessage] = useState("Register Berhasil, Silahkan Login terlebih dahulu untuk melanjutkan.");
 
     const [namaErr, setNamaErr] = useState(false);
     const [userErr, setUserErr] = useState(false);
@@ -23,7 +23,6 @@ export default function Register() {
     const [noHPErr, setNoHPErr] = useState(false);
     const [passErr, setPassErr] = useState(false);
     const navigate = useNavigate();
-
 
     async function collectData() {
         //validation
@@ -64,7 +63,6 @@ export default function Register() {
             setPassErr(false)
         }
 
-        console.log("aman ", aman)
         if (aman) {
             let item = { username, password, nama, alamat, no_hp, role };
             console.warn(item)
@@ -80,8 +78,6 @@ export default function Register() {
             result = await result.json();
 
             if (result.data) {
-                setModalShow(true)
-                navigate('/login');
                 setModalShow(true);
                 setUsername("");
                 setNama("");
