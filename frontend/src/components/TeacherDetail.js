@@ -38,6 +38,7 @@ const TeacherDetail = () => {
             {!loading ? (
                 <div className="col-md-6 mx-auto my-5">
                     <h3 className="mt-5 mb-3">DETAIL GURU</h3>
+                    <img src={detail?.profile_pict} className="rounded " style={{height: '250px'}} alt={`image profile ${detail?.name}`}/>
                     <table className="table">
                         <tbody>
                             <tr>

@@ -1,11 +1,12 @@
 import React, { useState } from "react"
 
-export default function Teachers({ name, description, rating, teaching_category, teaching_level, teaching_subject }) {
+export default function Teachers({ name, description, rating, teaching_category, teaching_level, teaching_subject, profilePict }) {
 
     return (
 
         <div className="card" aria-label="Post Card">
             <span className="teaching-level">{teaching_level}</span>
+            <img src={profilePict} className="card-image-top" style={{maxHeight: '300px', objectFit : "cover"}} />
             <div className="card-body">
                 <h5 className="card-title">{name}</h5>
                 <p className="card-text">{teaching_subject}</p>

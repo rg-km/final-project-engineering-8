@@ -84,6 +84,7 @@ function Home() {
                 <div className="d-flex flex-wrap col-md-12 wrap-teacher">
                     {cardGuru.map((item, index) => {
                         return <div className="col-md-4 col-sm-6 col-12" key={index}>
+                            <p>{item.id}</p>
                             <Link to={`/teacher/${item.id}`}>
                                 <Teachers
                                     name={item.name}
@@ -92,6 +93,7 @@ function Home() {
                                     teaching_category={item.teaching_category}
                                     teaching_level={item.teaching_level}
                                     teaching_subject={item.teaching_subject}
+                                    profilePict={item.profile_pict}
                                 />
                             </Link>
                         </div>
