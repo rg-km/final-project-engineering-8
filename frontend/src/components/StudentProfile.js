@@ -65,7 +65,7 @@ const StudentProfile = () => {
         }
         console.log('PAYLOAD REQUEST', payload)
         try {
-            const url = `http://localhost:8080/v1/student/${detail?.user_id}`;
+            const url = `https://api-dev-halloguru.herokuapp.com/v1/student/${detail?.user_id}`;
             const res = await axios.put(url, payload, { headers: { "Authorization": `Bearer ${auth.token}` } });
             if (!res.data.status) throw new Error(res.data.message)
 
