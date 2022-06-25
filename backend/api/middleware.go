@@ -19,81 +19,6 @@ func (api *API) AllowOrigin(c *gin.Context) {
 }
 
 func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
-	// return func(c *gin.Context) {
-	// 	err := GetAuthentication(c)
-
-	// 	if err != nil {
-	// 		c.JSON(401, gin.H{
-	// 			"status":  401,
-	// 			"message": err.Error(),
-	// 		})
-	// 		return
-	// 	}
-
-	// 	next(c)
-	// }
-	// return func(c *gin.Context) {
-	// 	api.AllowOrigin(c)
-	// 	token, err := c.Request.Cookie("token")
-	// 	if err != nil {
-	// 		if err == http.ErrNoCookie {
-	// 			c.Writer.WriteHeader(http.StatusUnauthorized)
-	// 			c.JSON(http.StatusUnauthorized, gin.H{
-	// 				"status":  "false",
-	// 				"code":    http.StatusUnauthorized,
-	// 				"message": "anda belum login",
-	// 			})
-	// 			return
-	// 		}
-	// 		c.JSON(http.StatusBadRequest, gin.H{
-	// 			"status":  "false",
-	// 			"code":    http.StatusBadRequest,
-	// 			"message": err.Error(),
-	// 		})
-	// 		return
-	// 	}
-
-	// 	tknStr := token.Value
-
-	// 	claims := &Claims{}
-
-	// 	tkn, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-	// 		return jwtKey, nil
-	// 	})
-
-	// 	if err != nil {
-	// 		if err == jwt.ErrSignatureInvalid {
-	// 			c.Writer.WriteHeader(http.StatusUnauthorized)
-	// 			c.JSON(http.StatusUnauthorized, gin.H{
-	// 				"status":  "false",
-	// 				"code":    http.StatusUnauthorized,
-	// 				"message": err.Error(),
-	// 			})
-	// 			return
-	// 		}
-	// 		c.Writer.WriteHeader(http.StatusBadRequest)
-	// 		c.JSON(http.StatusUnauthorized, gin.H{
-	// 			"status":  "false",
-	// 			"code":    http.StatusUnauthorized,
-	// 			"message": err.Error(),
-	// 		})
-	// 		return
-	// 	}
-
-	// 	if !tkn.Valid {
-	// 		c.Writer.WriteHeader(http.StatusUnauthorized)
-	// 		c.JSON(http.StatusUnauthorized, gin.H{
-	// 			"status":  "false",
-	// 			"code":    http.StatusUnauthorized,
-	// 			"message": "token invalid!",
-	// 		})
-	// 		return
-	// 	}
-
-	// 	ctx := context.WithValue(c, "username", claims.Username)
-	// 	ctx = context.WithValue(ctx, "role", claims.Role)
-	// 	next(c)
-	// }
 	return func(c *gin.Context) {
 		api.AllowOrigin(c)
 		var token string
@@ -170,34 +95,6 @@ func (api *API) AuthMiddleWare(next gin.HandlerFunc) gin.HandlerFunc {
 func (api *API) MiddlewareSiswa(next gin.HandlerFunc) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		api.AllowOrigin(c)
-		// token, _ := c.Request.Cookie("token")
-
-		// tknStr := token.Value
-
-		// claims := &Claims{}
-
-		// _, err := jwt.ParseWithClaims(tknStr, claims, func(token *jwt.Token) (interface{}, error) {
-		// 	return jwtKey, nil
-		// })
-
-		// if err != nil {
-		// 	if err == jwt.ErrSignatureInvalid {
-		// 		c.Writer.WriteHeader(http.StatusUnauthorized)
-		// 		c.JSON(http.StatusUnauthorized, gin.H{
-		// 			"status":  "false",
-		// 			"code":    http.StatusUnauthorized,
-		// 			"message": err.Error(),
-		// 		})
-		// 		return
-		// 	}
-		// 	c.Writer.WriteHeader(http.StatusBadRequest)
-		// 	c.JSON(http.StatusUnauthorized, gin.H{
-		// 		"status":  "false",
-		// 		"code":    http.StatusUnauthorized,
-		// 		"message": err.Error(),
-		// 	})
-		// 	return
-		// }
 
 		var token string
 		authHeader := c.Request.Header.Get("Authorization")
