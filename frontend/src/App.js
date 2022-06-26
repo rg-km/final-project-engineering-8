@@ -11,6 +11,7 @@ import StudentProfile from './components/StudentProfile'
 import PrivateComponent from './components/PrivateComponent'
 import LoginTeacher from './components/LoginTeacher'
 import NotFound from './components/NotFound';
+import Tentang from './components/Tentang';
 
 function App() {
   return (
@@ -29,6 +30,7 @@ function App() {
           <Route path="profile" element={<StudentProfile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
+        <Route path="Tentang" element={<Tentang />} />
       </Routes>
 
     </div >
