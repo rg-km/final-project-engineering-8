@@ -3,8 +3,8 @@ _A platform to bring teachers to your home 🏠_
 
 ### Final Assignment Ruangguru camp
 ##### See here for the results
-[https://halloguru.netlify.app/](https://halloguru.netlify.app/)
-[Postman Halloguru's Workspace](https://www.postman.com/material-cosmonaut-34402424/workspace/halloguru/collection/21528149-5e13d87e-139a-45c1-9226-511a050e5b07?ctx=documentation)
+Website => [https://halloguru.netlify.app/](https://halloguru.netlify.app/)
+API => [Postman Halloguru's Workspace](https://www.postman.com/material-cosmonaut-34402424/workspace/halloguru/collection/21528149-5e13d87e-139a-45c1-9226-511a050e5b07?ctx=documentation)
 
 #### Tech 
 - ReactJS (Frontend)
