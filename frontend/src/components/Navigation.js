@@ -10,6 +10,7 @@ function Navigation() {
 
     const logout = () => {
         localStorage.removeItem("user-info");
+        localStorage.removeItem("TOKEN");
         navigate('/home');
     }
 
@@ -32,7 +33,13 @@ function Navigation() {
                             </div>
                             :
                             <div className="d-flex">
-                                <Nav.Link href="/profile"><img src={auth.profile_pict} alt="profile pict" className="profile-pict" /> {auth.name}</Nav.Link>
+                                {auth.role === "siswa" ?
+
+                                    <Nav.Link href="/profile"><img src={auth.profile_pict} alt="profile pict" className="profile-pict" /> {auth.name}</Nav.Link>
+                                    :
+                                    <Nav.Link href={`/profile/teacher/${auth.id}`}><img src={auth.profile_pict} alt="profile pict" className="profile-pict" /> {auth.name}</Nav.Link>
+
+                                }
                                 <Nav.Link onClick={logout}>Logout</Nav.Link>
                             </div>
                         }

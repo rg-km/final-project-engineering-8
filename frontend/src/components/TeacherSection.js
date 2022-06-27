@@ -5,8 +5,8 @@ export default function TeacherSection() {
         <div className="jumbotron jumbotron-fluid my-5 py-5">
             <div className="container py-5 d-flex justify-content-center">
                 <div className="col-md-6 pd-5 m-3">
-                    <h3>DAFTAR MENJADI PENGAJAR DI HALLOGURU?</h3>
-                    <p className="lead">Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content.</p>
+                    <h3>BAGIKAN PASSION DAN SEMANGAT ANDA!!</h3>
+                    <p className="lead">DAFTAR MENJADI MITRA PENDIDIK untuk mengajar, membimbing, mengarahkan, melatih, menilai, dan mengevaluasi peserta didik.</p>
 
                 </div>
                 <div>

@@ -4,6 +4,7 @@ import '../style/LoginRegister.css'
 import image from '../images/login.svg'
 import { useNavigate } from 'react-router-dom'
 import Modal from "./Modal";
+import useStore from "../store/User";
 
 function Login() {
 
@@ -13,6 +14,7 @@ function Login() {
     const [passErr, setPassErr] = React.useState(false);
     const [modalShow, setModalShow] = React.useState(false);
     const [modalMessage, setModalMessage] = React.useState("Username/Pasword Salah");
+    const { token, id, name, role, setToken, setId, setName, setRole } = useStore()
     const navigate = useNavigate();
 
     const handleLogin = async () => {
@@ -43,10 +45,17 @@ function Login() {
                 }
             });
             result = await result.json();
-            console.warn(result);
+            console.log(result);
+            //zustand
+            setToken(result.token)
+            setId(result.id)
+            setName(result.name)
+            setRole(result.role)
+            const test = { token: result.token }
 
             if (result.status === true) {
                 localStorage.setItem("user-info", JSON.stringify(result));
+                localStorage.setItem("TOKEN", JSON.stringify(test));
                 navigate('/')
             } else {
                 setModalShow(true)
@@ -55,62 +64,65 @@ function Login() {
     }
 
     return (
-        <div className="container">
-            <div className="auth-wrapper">
-                <div className="wrapper-tr">
-                    <p className="forgot-password text-right mt-5 mb-2">Login Sebagai Guru? <a href="/login/teacher">disini</a></p>
-                </div>
-                <div className="login-wrapper d-flex">
+        <div className="auth-wrapper">
+            <div className="login-wrapper d-flex">
 
-                    <div className="login-left ">
-                        <form>
-                            <h3>LOGIN sebagai Murid</h3>
-                            <div className="mb-3">
-                                <label>Username</label>
-                                <input
-                                    type="text"
-                                    className="form-control"
-                                    placeholder="Masukkan username"
-                                    onChange={(e) => setUsername(e.target.value)}
-                                />
-                                {userErr ? <span className="warning">Username tidak boleh kosong</span> : ""}
-                            </div>
-                            <div className="mb-3">
-                                <label>Password</label>
-                                <input
-                                    type="password"
-                                    className="form-control"
-                                    placeholder="Masukkan password"
-                                    onChange={(e) => setPassword(e.target.value)}
-                                />
-                                {passErr ? <span className="warning">Password tidak boleh kosong</span> : ""}
+                <div className="login-left ">
+                    <form>
+                        <h3>LOGIN</h3>
+                        <div className="mb-3">
+                            <label>Username</label>
+                            <input
+                                type="text"
+                                className="form-control"
+                                placeholder="Masukkan username"
+                                onChange={(e) => setUsername(e.target.value)}
+                            />
+                            {userErr ? <span className="warning">Username tidak boleh kosong</span> : ""}
+                        </div>
+                        <div className="mb-3">
+                            <label>Password</label>
+                            <input
+                                type="password"
+                                className="form-control"
+                                placeholder="Masukkan password"
+                                onChange={(e) => setPassword(e.target.value)}
+                            />
+                            {passErr ? <span className="warning">Password tidak boleh kosong</span> : ""}
 
-                            </div>
+                        </div>
 
-                            <div className="d-grid">
-                                <button onClick={handleLogin} type="button" className="btn btn-primary">
-                                    Submit
-                                </button>
-                            </div>
-                            <p className="forgot-password text-right">
-                                Belum memiliki akun? <a href="/register">Register</a>
-                            </p>
-                        </form>
-                    </div>
+                        <div className="d-grid">
+                            <button onClick={handleLogin} type="button" className="btn btn-primary">
+                                Submit
+                            </button>
+                        </div>
+                        <p className="forgot-password text-right mt-3">
 
-                    <div className="login-right">
-                        <img src={image} className="align-middle" alt="hallo guru" />
-                        <p className="text-justify align-middle">Tempat terpercaya mencari guru private terbaik</p>
-                    </div>
+                            Belum memiliki akun?
+                        </p>
+                        <p className="forgot-password text-right">
+                            <a href="/register">Register Murid </a> | <a href="/register/teacher">Register Guru</a>
+                        </p>
+                        <p className="forgot-password text-right">
+
+
+                        </p>
+                    </form>
                 </div>
 
-                <Modal
-                    show={modalShow}
-                    onHide={() => setModalShow(false)}
-                    message={modalMessage}
-                />
+                <div className="login-right">
+                    <img src={image} className="align-middle" alt="hallo guru" />
+                    <p className="text-justify align-middle">Tempat terpercaya mencari guru private terbaik</p>
+                </div>
             </div>
-        </div>
+
+            <Modal
+                show={modalShow}
+                onHide={() => setModalShow(false)}
+                message={modalMessage}
+            />
+        </div >
     );
 }
 
