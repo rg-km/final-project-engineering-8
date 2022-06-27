@@ -4,7 +4,7 @@ import Navbar from './Navigation';
 import { useNavigate } from 'react-router-dom'
 import CInputImage from "./CInputImage";
 import Modal from "./Modal"
-
+import Footer from './Footer'
 
 const StudentProfile = () => {
     const [detail, setDetail] = useState(null);
@@ -13,7 +13,7 @@ const StudentProfile = () => {
     const [modal, setModal] = useState({ isShow: false, message: '', onHide: () => { } })
     const [isEditMode, setIsEditMode] = useState(false)
     const [base64Image, setBase64Image] = useState(null)
-    const auth = JSON.parse(localStorage.getItem("user-info"));
+    const auth = JSON.parse(localStorage.getItem("TOKEN"));
     const navigate = useNavigate();
 
     const loadDetail = async () => {
@@ -125,7 +125,7 @@ const StudentProfile = () => {
                     </table>
                     {
                         isEditMode &&
-                        <button className={buttonClass} onClick={handleUpdateStudent}>{isUpdating ? "Updating Profile..." :"Save Changes"}</button>
+                        <button className={buttonClass} onClick={handleUpdateStudent}>{isUpdating ? "Updating Profile..." : "Save Changes"}</button>
                     }
                     <button className={buttonClass} onClick={() => setIsEditMode(isEdit => !isEdit)}>{isEditMode ? "Cancel" : "Update"}</button>
                     <button className={buttonClass} onClick={() => deleteUser()}>Delete</button>
@@ -139,6 +139,8 @@ const StudentProfile = () => {
                 onHide={modal.onHide}
                 message={modal.message}
             />
+            <Footer />
+
         </div >
 
     );

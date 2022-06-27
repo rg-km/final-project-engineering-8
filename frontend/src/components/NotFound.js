@@ -7,7 +7,7 @@ const NotFound = () => {
   return (
     <main>
       <h1 className="grey">Not Found </h1>
-      <button onClick={() => navigate(-1)}>Take me back</button>
+      <button className="btn btn-primary" onClick={() => navigate(-1)}>Take me back</button>
     </main>
   );
 };

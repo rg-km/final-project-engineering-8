@@ -102,3 +102,8 @@ html,
   background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%);
   border: none !important;
 }
+
+.btn-primary>a {
+  color: white;
+  font-weight: bold;
+}

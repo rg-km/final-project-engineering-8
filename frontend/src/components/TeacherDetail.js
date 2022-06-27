@@ -2,13 +2,13 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { useParams } from "react-router-dom";
 import Navbar from './Navigation';
+import Footer from './Footer'
 
 const TeacherDetail = () => {
     const [detail, setDetail] = useState(null);
     const [loading, setLoading] = useState(false);
     const { id } = useParams();
-    const [urlWA, setURLWA] = useState();
-    const auth = JSON.parse(localStorage.getItem("user-info"));
+    const auth = JSON.parse(localStorage.getItem("TOKEN"));
 
     const loadDetail = async () => {
         setLoading(true);
@@ -17,9 +17,6 @@ const TeacherDetail = () => {
             const { data } = await axios.get(url, { headers: { "Authorization": `Bearer ${auth.token}` } });
 
             setDetail(data.data);
-            console.log("detail teacher : ", data);
-            setURLWA("https://wa.me/" + data.no_hp);
-            console.log("wa " + urlWA)
         } catch (error) {
             console.log(error);
         }
@@ -38,7 +35,7 @@ const TeacherDetail = () => {
             {!loading ? (
                 <div className="col-md-6 mx-auto my-5">
                     <h3 className="mt-5 mb-3">DETAIL GURU</h3>
-                    <img src={detail?.profile_pict} className="rounded " style={{height: '250px'}} alt={`image profile ${detail?.name}`}/>
+                    <img src={detail?.profile_pict} className="rounded " style={{ height: '250px' }} alt={`image profile ${detail?.name}`} />
                     <table className="table">
                         <tbody>
                             <tr>
@@ -51,7 +48,7 @@ const TeacherDetail = () => {
                             </tr>
                             <tr>
                                 <th>Description</th>
-                                <td>{detail?.description} cm</td>
+                                <td>{detail?.description}</td>
                             </tr>
                             <tr>
                                 <th>Fee</th>
@@ -75,7 +72,7 @@ const TeacherDetail = () => {
                             </tr>
                         </tbody>
                     </table>
-                    <button className="btn btn-primary mt-3"> <a href={urlWA}>Hubungi</a>
+                    <button className="btn btn-primary mt-3"> <a href={`https://wa.me/${detail?.no_hp}`} target="_blank">Hubungi</a>
 
                     </button>
                 </div>
@@ -83,6 +80,8 @@ const TeacherDetail = () => {
                 <h2>Loading...</h2>
             )
             }
+            <Footer />
+
         </div >
 
     );

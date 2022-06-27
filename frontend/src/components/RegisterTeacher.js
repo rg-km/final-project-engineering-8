@@ -6,7 +6,6 @@ import image from '../images/register.svg'
 import { useNavigate } from 'react-router-dom'
 import Modal from "./Modal";
 
-
 export default function Register() {
 
     //item
@@ -82,8 +81,22 @@ export default function Register() {
             setPassErr(false)
         }
 
+        if (deskripsi.length === 0) {
+            setDeskripsiErr(true)
+            aman = false;
+        } else {
+            setPassErr(false)
+        }
+
+        if (fee.length === 0) {
+            setBiayaErr(true)
+            aman = false;
+        } else {
+            setPassErr(false)
+        }
+
         if (aman) {
-            let biaya = "Rp. " + rupiah(fee);
+            let biaya = rupiah(fee);
             let item = { username, password, nama, alamat, no_hp, deskripsi, biaya, jenjang_id, pelajaran_id, kategori_id };
             console.warn(item)
 
@@ -182,7 +195,7 @@ export default function Register() {
                                     value={deskripsi}
                                     onChange={(e) => setDeskripsi(e.target.value)}
                                 />
-                                {deskripsiErr ? <span className="warning">Alamat tidak boleh kosong</span> : ""}
+                                {deskripsiErr ? <span className="warning">Deskripsi tidak boleh kosong</span> : ""}
 
                             </div>
                             <div className="mb-3">
@@ -194,7 +207,7 @@ export default function Register() {
                                     value={fee}
                                     onChange={(e) => setFee(e.target.value)}
                                 />
-                                {biayaErr ? <span className="warning">No HP tidak boleh kosong</span> : ""}
+                                {biayaErr ? <span className="warning">Biaya tidak boleh kosong</span> : ""}
 
                             </div>
                             <div className="d-flex">
@@ -256,7 +269,9 @@ export default function Register() {
                                     Sign Up
                                 </button>
                             </div>
-
+                            <p className="forgot-password text-right">
+                                Sudah memiliki akun? <a href="/login">Login</a>
+                            </p>
                         </form>
                     </div>
                 </div >

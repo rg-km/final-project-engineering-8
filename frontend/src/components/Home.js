@@ -7,11 +7,14 @@ import '../App.css';
 import Teachers from "./Teachers";
 import Navbar from './Navigation';
 import TeacherSection from "./TeacherSection";
-import HomeAnimation from "../images/Kids-Studying.gif"
+import HomeAnimation from "../images/Kids-Studying-from-Home.gif"
+import Footer from "./Footer"
 
 function Home() {
 
+    const auth = JSON.parse(localStorage.getItem("user-info"));
     const [cardGuru, setCardGuru] = useState([]);
+    const [searchTerm, setSearchTerm] = useState("");
 
     const getCardGuruData = async () => {
         try {
@@ -40,8 +43,10 @@ function Home() {
                     </div>
 
                     <div className="caption col-md-5">
-                        <h3>SOLUSI TEPAT MENCARI GURU TERBAIK</h3>
-                        <p>Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content.</p>
+                        <h3>SIMPLIFY STUDY AT HOME</h3>
+                        <p>HALLOGURU merupkan inovasi baru untuk mencari pendidik dengan sangat cepat.
+                            Kegiatan belajar mengajar menjadi lebih mudah dengan menghadirkan tenaga didik ke rumah.
+                        </p>
                         <div className="d-flex flex-wrap col-md-12 pt-2">
                             <div className="col-md-4 col-sm-6 col-12">
                                 <div className="card card-fitur">
@@ -64,7 +69,7 @@ function Home() {
                 </div>
             </div>
 
-            <TeacherSection />
+            {!auth ? <TeacherSection /> : <p></p>}
 
             <div className="container my-5 py-5">
                 <h3>CARI GURU TERBAIK UNTUKMU</h3>
@@ -74,7 +79,10 @@ function Home() {
                         <input
                             type="text"
                             className="form-control"
-                            placeholder="Cari"
+                            placeholder="Cari..."
+                            onChange={(event) => {
+                                setSearchTerm(event.target.value)
+                            }}
                         />
                     </div>
                     <button type="button" className="btn btn-primary">
@@ -82,7 +90,16 @@ function Home() {
                     </button>
                 </div>
                 <div className="d-flex flex-wrap col-md-12 wrap-teacher">
-                    {cardGuru.map((item, index) => {
+                    {cardGuru.filter((item) => {
+                        if (searchTerm == "") return item;
+                        else if (item.teaching_level.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                            item.teaching_subject.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                            item.teaching_category.toLowerCase().includes(searchTerm.toLocaleLowerCase()) ||
+                            item.name.toLowerCase().includes(searchTerm.toLocaleLowerCase())
+                        ) {
+                            return item
+                        }
+                    }).map((item, index) => {
                         return <div className="col-md-4 col-sm-6 col-12" key={index}>
                             <Link to={`/teacher/${item.id}`}>
                                 <Teachers
@@ -100,6 +117,7 @@ function Home() {
                     )}
                 </div>
             </div>
+            <Footer />
         </div >
     );
 }

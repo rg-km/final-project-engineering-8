@@ -2,7 +2,6 @@ import { Modal } from 'react-bootstrap';
 import { Button } from 'react-bootstrap';
 
 function CenteredModal(props) {
-    console.log("modal dat " + props.message)
     return (
         <Modal
             {...props}

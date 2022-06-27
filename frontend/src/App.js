@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useEffect } from 'react';
 import '../node_modules/bootstrap/dist/css/bootstrap.min.css'
 import './App.css'
 import { Routes, Route } from 'react-router-dom'
@@ -10,9 +10,15 @@ import TeacherDetail from './components/TeacherDetail';
 import StudentProfile from './components/StudentProfile'
 import PrivateComponent from './components/PrivateComponent'
 import LoginTeacher from './components/LoginTeacher'
+import TeacherProfile from './components/TeacherProfile'
 import NotFound from './components/NotFound';
 
 function App() {
+
+  useEffect(() => {
+    document.title = `HALLOGURU`;
+  });
+
   return (
 
     <div className="App">
@@ -27,6 +33,7 @@ function App() {
         <Route element={<PrivateComponent />}>
           <Route path="teacher/:id" element={<TeacherDetail />} />
           <Route path="profile" element={<StudentProfile />} />
+          <Route path="profile/teacher/:id" element={<TeacherProfile />} />
         </Route>
         <Route path="*" element={<NotFound />} />
       </Routes>

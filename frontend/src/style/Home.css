@@ -22,20 +22,14 @@ img.animated-gif {
     animation-duration: 1000s;
 }
 
-.teaching-level {
+.bg-wow {
     background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%);
-    padding: 5px;
-
+    padding: 5px 15px;
     align-items: right;
     border-radius: 15px;
     margin-bottom: 10px;
-}
-
-.teaching-category {
-    font-size: 12px;
-    /* background: linear-gradient(315deg, #A4EFE0 0%, #8274C0 100%); */
-    padding: 4px;
-
+    font-size: 14px;
+    color: white;
 }
 
 .rating {
@@ -54,6 +48,7 @@ img.animated-gif {
     min-height: 10px;
     margin: 0;
     padding: 0;
+    color: white;
 }
 
 .wrap-teacher>*:hover {
@@ -69,4 +64,11 @@ img.animated-gif {
     border-radius: 50%;
     width: 30px;
     height: 30px;
+}
+
+.deskripsi {
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 3;
+    -webkit-box-orient: vertical;
 }
